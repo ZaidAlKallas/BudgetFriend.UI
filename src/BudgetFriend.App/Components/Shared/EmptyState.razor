@@ -1,0 +1,13 @@
+<div class="state">
+    <div class="state-icon" aria-hidden="true">--</div>
+    <span>@Text</span>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

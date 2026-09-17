@@ -1,0 +1,25 @@
+@inject LocalizationService Local
+
+@if (TotalPages > 1)
+{
+    <div class="pagination">
+        <button class="btn btn-ghost btn-sm" disabled="@(PageNumber <= 1)" @onclick="() => OnPageChanged.InvokeAsync(PageNumber - 1)">
+            <SvgIcon Name="chevron-left" Size="16" /> @Local["Action.Previous"]
+        </button>
+        <span class="page-numbers">@PageNumber / @TotalPages</span>
+        <button class="btn btn-ghost btn-sm" disabled="@(PageNumber >= TotalPages)" @onclick="() => OnPageChanged.InvokeAsync(PageNumber + 1)">
+            @Local["Action.Next"] <SvgIcon Name="chevron-right" Size="16" />
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public int PageNumber { get; set; }
+
+    [Parameter, EditorRequired]
+    public int TotalPages { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<int> OnPageChanged { get; set; }
+}

@@ -1,0 +1,31 @@
+@inject FinanceFormatter Formatter
+
+@{
+    var modifier = Colorize
+        ? (Amount < 0 ? "negative" : "positive")
+        : "";
+}
+
+<span class="money @modifier">@DisplayText</span>
+
+@code {
+    [Parameter]
+    public decimal Amount { get; set; }
+
+    [Parameter]
+    public Currency? Currency { get; set; }
+
+    [Parameter]
+    public bool Colorize { get; set; } = true;
+
+    [Parameter]
+    public bool ShowCurrency { get; set; } = true;
+
+    /// <summary>When true, amounts are styled as expenses (red) regardless of sign.</summary>
+    [Parameter]
+    public bool ForceExpense { get; set; }
+
+    private string DisplayText => ShowCurrency && Currency.HasValue
+        ? Formatter.Currency(Amount, Currency.Value.ToString())
+        : Formatter.Amount(Amount);
+}

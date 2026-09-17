@@ -1,0 +1,75 @@
+@inherits LocalizedComponentBase
+@page "/settings"
+@attribute [Authorize]
+@inject IAuthService Auth
+@inject FinanceFormatter Formatter
+
+<PageHeader Title="@Local["Settings.Title"]">
+</PageHeader>
+
+<div class="grid grid-2">
+    <div class="card">
+        <h2 class="card-title">@Local["Settings.Language"]</h2>
+        <LanguageSwitch />
+    </div>
+
+    <div class="card">
+        <h2 class="card-title">@Local["Settings.Theme"]</h2>
+        <ThemeSwitch />
+    </div>
+
+    <div class="card">
+        <h2 class="card-title">@Local["Settings.Account"]</h2>
+        @if (_profile is null)
+        {
+            <LoadingIndicator Text="@Local["State.Loading"]" />
+        }
+        else
+        {
+            <div class="list-item" style="margin-bottom:12px;">
+                <span class="nav-icon"><SvgIcon Name="user" Size="20" /></span>
+                <div class="grow">
+                    <div class="strong small">@_profile.FirstName @_profile.LastName</div>
+                    <div class="muted tiny">@_profile.Email</div>
+                </div>
+                @if (_profile.IsEmailVerified)
+                {
+                    <span class="chip chip-income"><SvgIcon Name="check" Size="13" /> @Local["Settings.Verified"]</span>
+                }
+                else
+                {
+                    <span class="chip chip-expense">@Local["Settings.NotVerified"]</span>
+                }
+            </div>
+        }
+
+        <button class="btn btn-danger-ghost" @onclick="LogoutAsync" disabled="@_loggingOut">
+            <SvgIcon Name="logout" Size="16" /> @Local["Settings.Logout"]
+        </button>
+    </div>
+
+    <div class="card">
+        <h2 class="card-title">BudgetFriend</h2>
+        <p class="form-note">
+            Cross-platform personal finance manager. Web is online-first; the
+            mobile app keeps your data locally on the device.
+        </p>
+    </div>
+</div>
+
+@code {
+    private UserProfile? _profile;
+    private bool _loggingOut;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _profile = await Auth.GetProfileAsync();
+    }
+
+    private async Task LogoutAsync()
+    {
+        _loggingOut = true;
+        await Auth.LogoutAsync();
+        _loggingOut = false;
+    }
+}

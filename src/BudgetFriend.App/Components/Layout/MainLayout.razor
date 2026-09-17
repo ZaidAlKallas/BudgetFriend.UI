@@ -1,0 +1,158 @@
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthProvider
+@inject IAuthService Auth
+@inject ApiHttpClient Api
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@inject ThemeService Theme
+@inject LocalizationService Local
+@implements IDisposable
+
+@if (_isAuthenticated)
+{
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="logo">B</span>
+                <span>BudgetFriend</span>
+            </div>
+            <NavMenu />
+            <div class="sidebar-footer">
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <ThemeSwitch />
+                    <LanguageSwitch />
+                    <button class="nav-link" @onclick="LogoutAsync">
+                        <span class="nav-icon"><SvgIcon Name="logout" Size="20" /></span>
+                        <span>@Local["Settings.Logout"]</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="app-main">
+            <TopBar />
+            <main class="app-content">
+                @Body
+            </main>
+        </div>
+
+        <NavMenu IsBottom="true" />
+    </div>
+}
+else
+{
+    <div class="auth-chrome">
+        <TopBar />
+        <div class="auth-shell">
+            @Body
+        </div>
+    </div>
+}
+
+@code {
+    private bool _isAuthenticated;
+    private DotNetObjectReference<MainLayout>? _self;
+
+    // ---- Lifecycle -----------------------------------------------------------
+
+    protected override void OnInitialized()
+    {
+        AuthProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+        Theme.ThemeChanged += OnChromeChanged;
+        Local.LanguageChanged += OnChromeChanged;
+        Api.SessionExpired += OnSessionExpired;
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!Auth.IsAuthenticated)
+            {
+                // Restores a persisted session (browser storage / secure storage)
+                // and raises the authentication state change event.
+                await Auth.InitializeAsync();
+            }
+
+            await Theme.InitializeAsync();
+            await Local.InitializeAsync();
+            _self = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("bf.applyTheme", Theme.IsDark);
+            await JS.InvokeVoidAsync("bf.applyLanguage", Local.LanguageCode);
+            await JS.InvokeVoidAsync("bf.watchSystemThemeForNet", _self, nameof(OnSystemThemeChanged));
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+        Theme.ThemeChanged -= OnChromeChanged;
+        Local.LanguageChanged -= OnChromeChanged;
+        Api.SessionExpired -= OnSessionExpired;
+        Nav.LocationChanged -= OnLocationChanged;
+        _self?.Dispose();
+    }
+
+    // ---- Interop callbacks ---------------------------------------------------
+
+    [JSInvokable]
+    public Task OnSystemThemeChanged(bool isDark) => Theme.ApplySystemSchemeAsync(isDark);
+
+    // ---- Event handlers ------------------------------------------------------
+
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        var state = await task;
+        _isAuthenticated = state.User.Identity?.IsAuthenticated == true;
+        await InvokeAsync(StateHasChanged);
+        HandleRouting();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => HandleRouting();
+
+    // Redirects anonymous users away from protected routes and authenticated
+    // users away from the auth pages. Route protection is enforced here (instead
+    // of endpoint-level [Authorize]) because authentication is JWT-in-handler.
+    private void HandleRouting()
+    {
+        var path = Nav.ToBaseRelativePath(Nav.Uri).Trim('/').ToLowerInvariant();
+        var isProtected = path is "" or "accounts" or "transactions" or "transfers" or "categories" or "settings";
+        var isAuthPage = path is "login" or "register" or "forgot-password";
+
+        if (!_isAuthenticated && isProtected)
+        {
+            Nav.NavigateTo("/login");
+        }
+        else if (_isAuthenticated && isAuthPage)
+        {
+            Nav.NavigateTo("/");
+        }
+    }
+
+    private async void OnChromeChanged() => await InvokeAsync(OnChromeChangedCore);
+
+    private Task OnChromeChangedCore()
+    {
+        StateHasChanged();
+        return ApplyChromeAsync();
+    }
+
+    private async Task ApplyChromeAsync()
+    {
+        await JS.InvokeVoidAsync("bf.applyTheme", Theme.IsDark);
+        await JS.InvokeVoidAsync("bf.applyLanguage", Local.LanguageCode);
+    }
+
+    private async Task OnSessionExpired()
+    {
+        await Auth.LogoutAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LogoutAsync()
+    {
+        await Auth.LogoutAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+}

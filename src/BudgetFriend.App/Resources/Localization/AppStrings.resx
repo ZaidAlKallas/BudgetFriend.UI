@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Navigation -->
+  <data name="Nav.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Nav.Accounts" xml:space="preserve"><value>Accounts</value></data>
+  <data name="Nav.Transactions" xml:space="preserve"><value>Transactions</value></data>
+  <data name="Nav.Transfers" xml:space="preserve"><value>Transfers</value></data>
+  <data name="Nav.Categories" xml:space="preserve"><value>Categories</value></data>
+  <data name="Nav.Settings" xml:space="preserve"><value>Settings</value></data>
+
+  <!-- Authentication -->
+  <data name="Auth.Login" xml:space="preserve"><value>Log in</value></data>
+  <data name="Auth.Register" xml:space="preserve"><value>Create account</value></data>
+  <data name="Auth.Logout" xml:space="preserve"><value>Log out</value></data>
+  <data name="Auth.Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Auth.Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Auth.ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="Auth.FirstName" xml:space="preserve"><value>First name</value></data>
+  <data name="Auth.LastName" xml:space="preserve"><value>Last name</value></data>
+  <data name="Auth.ForgotPassword" xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Auth.ResetPassword" xml:space="preserve"><value>Reset password</value></data>
+  <data name="Auth.VerifyEmail" xml:space="preserve"><value>Verify email</value></data>
+  <data name="Auth.ResendVerification" xml:space="preserve"><value>Resend verification</value></data>
+  <data name="Auth.SignInWithGoogle" xml:space="preserve"><value>Sign in with Google</value></data>
+  <data name="Auth.Or" xml:space="preserve"><value>or</value></data>
+  <data name="Auth.GoogleUnavailable" xml:space="preserve"><value>Google sign-in is not configured.</value></data>
+  <data name="Auth.NoAccount" xml:space="preserve"><value>Don't have an account?</value></data>
+  <data name="Auth.HasAccount" xml:space="preserve"><value>Already have an account?</value></data>
+  <data name="Auth.LoginTitle" xml:space="preserve"><value>Welcome back</value></data>
+  <data name="Auth.RegisterTitle" xml:space="preserve"><value>Create your account</value></data>
+
+  <!-- Actions -->
+  <data name="Action.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Action.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Action.Create" xml:space="preserve"><value>Create</value></data>
+  <data name="Action.Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Action.Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Action.Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="Action.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Action.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Action.Previous" xml:space="preserve"><value>Previous</value></data>
+  <data name="Action.Confirm" xml:space="preserve"><value>Confirm</value></data>
+  <data name="Action.OK" xml:space="preserve"><value>OK</value></data>
+
+  <!-- States -->
+  <data name="State.Loading" xml:space="preserve"><value>Loading...</value></data>
+  <data name="State.Empty" xml:space="preserve"><value>No data yet.</value></data>
+  <data name="State.Error" xml:space="preserve"><value>Something went wrong.</value></data>
+  <data name="State.TryAgain" xml:space="preserve"><value>Try again</value></data>
+  <data name="State.NoAccounts" xml:space="preserve"><value>No accounts yet. Create your first account to get started.</value></data>
+  <data name="State.NoCategories" xml:space="preserve"><value>No categories yet.</value></data>
+  <data name="State.NoTransactions" xml:space="preserve"><value>No transactions yet.</value></data>
+  <data name="State.NoTransfers" xml:space="preserve"><value>No transfers yet.</value></data>
+  <data name="State.NoResults" xml:space="preserve"><value>No results found.</value></data>
+  <data name="State.Now" xml:space="preserve"><value>Now</value></data>
+
+  <!-- Dashboard -->
+  <data name="Dashboard.Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Dashboard.TotalBalance" xml:space="preserve"><value>Total Balance</value></data>
+  <data name="Dashboard.MonthlyIncome" xml:space="preserve"><value>Monthly Income</value></data>
+  <data name="Dashboard.MonthlyExpenses" xml:space="preserve"><value>Monthly Expenses</value></data>
+  <data name="Dashboard.NetAmount" xml:space="preserve"><value>Net Amount</value></data>
+  <data name="Dashboard.TopCategories" xml:space="preserve"><value>Top Spending Categories</value></data>
+  <data name="Dashboard.RecentTransactions" xml:space="preserve"><value>Recent Transactions</value></data>
+  <data name="Dashboard.Summary" xml:space="preserve"><value>Financial Summary</value></data>
+  <data name="Dashboard.Period" xml:space="preserve"><value>Period</value></data>
+  <data name="Dashboard.FromDate" xml:space="preserve"><value>From</value></data>
+  <data name="Dashboard.ToDate" xml:space="preserve"><value>To</value></data>
+  <data name="Dashboard.CategoryBreakdown" xml:space="preserve"><value>Category Breakdown</value></data>
+
+  <!-- Accounts -->
+  <data name="Account.Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Account.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Account.InitialBalance" xml:space="preserve"><value>Initial Balance</value></data>
+  <data name="Account.CurrentBalance" xml:space="preserve"><value>Current Balance</value></data>
+  <data name="Account.Currency" xml:space="preserve"><value>Currency</value></data>
+  <data name="Account.Create" xml:space="preserve"><value>Create Account</value></data>
+  <data name="Account.Edit" xml:space="preserve"><value>Edit Account</value></data>
+  <data name="Account.Delete" xml:space="preserve"><value>Delete Account</value></data>
+  <data name="Account.Details" xml:space="preserve"><value>Account Details</value></data>
+  <data name="Account.Transactions" xml:space="preserve"><value>Transactions</value></data>
+
+  <!-- Categories -->
+  <data name="Category.Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Category.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Category.Create" xml:space="preserve"><value>Create Category</value></data>
+  <data name="Category.Edit" xml:space="preserve"><value>Edit Category</value></data>
+  <data name="Category.Delete" xml:space="preserve"><value>Delete Category</value></data>
+  <data name="Category.TransactionType" xml:space="preserve"><value>Transaction Type</value></data>
+
+  <!-- Transaction Types -->
+  <data name="TxType.Income" xml:space="preserve"><value>Income</value></data>
+  <data name="TxType.Expense" xml:space="preserve"><value>Expense</value></data>
+  <data name="TxType.TransferIn" xml:space="preserve"><value>Transfer In</value></data>
+  <data name="TxType.TransferOut" xml:space="preserve"><value>Transfer Out</value></data>
+
+  <!-- Transactions -->
+  <data name="Transaction.Transaction" xml:space="preserve"><value>Transaction</value></data>
+  <data name="Transaction.Create" xml:space="preserve"><value>Add Transaction</value></data>
+  <data name="Transaction.Edit" xml:space="preserve"><value>Edit Transaction</value></data>
+  <data name="Transaction.Delete" xml:space="preserve"><value>Delete Transaction</value></data>
+  <data name="Transaction.Amount" xml:space="preserve"><value>Amount</value></data>
+  <data name="Transaction.Note" xml:space="preserve"><value>Note</value></data>
+  <data name="Transaction.Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Transaction.Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Transaction.Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Transaction.Filter" xml:space="preserve"><value>Filter</value></data>
+  <data name="Transaction.SelectDate" xml:space="preserve"><value>Select date</value></data>
+
+  <!-- Transfers -->
+  <data name="Transfer.Transfer" xml:space="preserve"><value>Transfer</value></data>
+  <data name="Transfer.Create" xml:space="preserve"><value>New Transfer</value></data>
+  <data name="Transfer.Delete" xml:space="preserve"><value>Delete Transfer</value></data>
+  <data name="Transfer.FromAccount" xml:space="preserve"><value>From Account</value></data>
+  <data name="Transfer.ToAccount" xml:space="preserve"><value>To Account</value></data>
+  <data name="Transfer.FromAmount" xml:space="preserve"><value>From Amount</value></data>
+  <data name="Transfer.ToAmount" xml:space="preserve"><value>To Amount</value></data>
+  <data name="Transfer.Date" xml:space="preserve"><value>Transfer Date</value></data>
+
+  <!-- Time -->
+  <data name="Time.AM" xml:space="preserve"><value>AM</value></data>
+  <data name="Time.PM" xml:space="preserve"><value>PM</value></data>
+
+  <!-- Settings -->
+  <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings.Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings.Theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="Settings.ThemeLight" xml:space="preserve"><value>Light</value></data>
+  <data name="Settings.ThemeDark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Settings.ThemeSystem" xml:space="preserve"><value>System</value></data>
+  <data name="Settings.Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Settings.Logout" xml:space="preserve"><value>Log Out</value></data>
+  <data name="Settings.Verified" xml:space="preserve"><value>Verified</value></data>
+  <data name="Settings.NotVerified" xml:space="preserve"><value>Not verified</value></data>
+
+  <!-- Common -->
+  <data name="Common.Confirm" xml:space="preserve"><value>Are you sure?</value></data>
+  <data name="Common.Success" xml:space="preserve"><value>Success</value></data>
+  <data name="Common.OperationCompleted" xml:space="preserve"><value>The operation was completed successfully.</value></data>
+
+  <!-- Validation -->
+  <data name="Validation.Required" xml:space="preserve"><value>This field is required.</value></data>
+  <data name="Validation.InvalidEmail" xml:space="preserve"><value>Please enter a valid email address.</value></data>
+  <data name="Validation.PasswordMismatch" xml:space="preserve"><value>The passwords do not match.</value></data>
+  <data name="Validation.PasswordTooShort" xml:space="preserve"><value>Password must be at least 6 characters.</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.Network" xml:space="preserve"><value>Unable to connect. Please check your internet connection.</value></data>
+  <data name="Error.Server" xml:space="preserve"><value>A server error occurred. Please try again later.</value></data>
+  <data name="Error.Unexpected" xml:space="preserve"><value>An unexpected error occurred.</value></data>
+  <data name="Error.Unauthorized" xml:space="preserve"><value>Your session has expired. Please log in again.</value></data>
+  <data name="Error.Timeout" xml:space="preserve"><value>The request timed out. Please try again.</value></data>
+  <data name="Error.Http400" xml:space="preserve"><value>Your request could not be processed.</value></data>
+  <data name="Error.Http401" xml:space="preserve"><value>Please sign in to continue.</value></data>
+  <data name="Error.Http403" xml:space="preserve"><value>You don't have permission to do that.</value></data>
+  <data name="Error.Http404" xml:space="preserve"><value>This item no longer exists.</value></data>
+  <data name="Error.Http405" xml:space="preserve"><value>This action is not allowed.</value></data>
+  <data name="Error.Http409" xml:space="preserve"><value>The item was changed by someone else. Try again.</value></data>
+  <data name="Error.Http422" xml:space="preserve"><value>Some of the information you entered is not valid.</value></data>
+  <data name="Error.Http429" xml:space="preserve"><value>Too many attempts. Please wait and try again.</value></data>
+  <data name="Error.Http5xx" xml:space="preserve"><value>The server is having trouble. Please try again later.</value></data>
+</root>

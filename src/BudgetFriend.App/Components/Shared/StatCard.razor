@@ -1,0 +1,15 @@
+<div class="card stat">
+    <span class="stat-label">@Label</span>
+    <span class="stat-value @Modifier">@ChildContent</span>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public string? Modifier { get; set; }
+}

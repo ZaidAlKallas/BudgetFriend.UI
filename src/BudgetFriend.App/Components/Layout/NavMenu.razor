@@ -1,0 +1,53 @@
+@inject LocalizationService Local
+@implements IDisposable
+
+@{
+    var links = new (string Href, string Key, string Icon, NavLinkMatch Match)[]
+    {
+        ("/", "Nav.Dashboard", "grid", NavLinkMatch.All),
+        ("/accounts", "Nav.Accounts", "wallet", NavLinkMatch.Prefix),
+        ("/transactions", "Nav.Transactions", "list", NavLinkMatch.Prefix),
+        ("/transfers", "Nav.Transfers", "transfer", NavLinkMatch.Prefix),
+        ("/categories", "Nav.Categories", "tag", NavLinkMatch.Prefix),
+    };
+}
+
+@if (IsBottom)
+{
+    <nav class="bottom-nav">
+        @foreach (var link in links)
+        {
+            <NavLink class="nav-link" href="@link.Href" Match="@link.Match">
+                <span class="nav-icon"><SvgIcon Name="@link.Icon" Size="22" /></span>
+                <span>@Local[link.Key]</span>
+            </NavLink>
+        }
+    </nav>
+}
+else
+{
+    <nav style="display:flex; flex-direction:column; gap:4px;">
+        @foreach (var link in links)
+        {
+            <NavLink class="nav-link" href="@link.Href" Match="@link.Match">
+                <span class="nav-icon"><SvgIcon Name="@link.Icon" Size="20" /></span>
+                <span>@Local[link.Key]</span>
+            </NavLink>
+        }
+        <NavLink class="nav-link" href="/settings" Match="@NavLinkMatch.Prefix">
+            <span class="nav-icon"><SvgIcon Name="gear" Size="20" /></span>
+            <span>@Local["Nav.Settings"]</span>
+        </NavLink>
+    </nav>
+}
+
+@code {
+    [Parameter]
+    public bool IsBottom { get; set; }
+
+    protected override void OnInitialized() => Local.LanguageChanged += OnLanguageChanged;
+
+    private void OnLanguageChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Local.LanguageChanged -= OnLanguageChanged;
+}

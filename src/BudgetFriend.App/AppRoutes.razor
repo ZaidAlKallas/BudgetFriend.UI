@@ -1,0 +1,9 @@
+<Router AppAssembly="typeof(AppRoutes).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(Components.Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1, [tabindex='-1']" />
+    </Found>
+    <NotFound>
+        <NotFoundPage />
+    </NotFound>
+</Router>

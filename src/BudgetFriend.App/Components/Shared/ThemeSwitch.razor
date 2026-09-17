@@ -1,0 +1,46 @@
+@inject ThemeService Theme
+@inject LocalizationService Local
+@implements IDisposable
+
+<div class="segmented" role="group" aria-label="@Local["Settings.Theme"]">
+    @foreach (var option in Options)
+    {
+        <button type="button"
+                class="@(Theme.SelectedTheme == option ? "active" : "")"
+                @onclick="() => ApplyAsync(option)">
+            @switch (option)
+            {
+                case AppTheme.Light:
+                    <SvgIcon Name="sun" Size="16" /> @Local["Settings.ThemeLight"]
+                    break;
+                case AppTheme.Dark:
+                    <SvgIcon Name="moon" Size="16" /> @Local["Settings.ThemeDark"]
+                    break;
+                default:
+                    <SvgIcon Name="monitor" Size="16" /> @Local["Settings.ThemeSystem"]
+                    break;
+            }
+        </button>
+    }
+</div>
+
+@code {
+    private static readonly AppTheme[] Options = { AppTheme.System, AppTheme.Light, AppTheme.Dark };
+
+    private async Task ApplyAsync(AppTheme theme) => await Theme.SetThemeAsync(theme);
+
+    protected override void OnInitialized()
+    {
+        Theme.ThemeChanged += OnThemeChanged;
+        Local.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnThemeChanged() => InvokeAsync(StateHasChanged);
+    private void OnLanguageChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Theme.ThemeChanged -= OnThemeChanged;
+        Local.LanguageChanged -= OnLanguageChanged;
+    }
+}

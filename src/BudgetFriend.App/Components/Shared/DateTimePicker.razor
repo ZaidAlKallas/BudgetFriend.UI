@@ -1,0 +1,273 @@
+@inherits InputBase<DateTime?>
+@inject LocalizationService Local
+@inject IJSRuntime JS
+
+
+<span class="dtp">
+    <button type="button"
+            @ref="_trigger"
+            class="dtp-trigger @(IsInvalid ? "invalid" : "")"
+            title="@Local["Transaction.Date"]"
+            @onclick="Toggle">
+        <SvgIcon Name="calendar" Size="16" />
+        <span class="dtp-value">@DisplayText</span>
+        <SvgIcon Name="chevron-down" Size="16" />
+    </button>
+
+    @if (_open)
+    {
+        <button type="button" class="dtp-backdrop" tabindex="-1" aria-hidden="true" @onclick="Close"></button>
+        <span class="dtp-popover" role="dialog" aria-modal="true" aria-label="@Local["Transaction.Date"]" @ref="_popover">
+            <div class="dtp-nav">
+                <button type="button" class="dtp-nav-btn" @onclick="PrevMonth" aria-label="@Local["Action.Previous"]">
+                    <SvgIcon Name="chevron-left" Size="16" />
+                </button>
+                <select class="dtp-select dtp-month" @onchange="OnMonthChanged">
+                    @for (var m = 1; m <= 12; m++)
+                    {
+                        <option value="@m" selected="@(m == ViewMonth)">@Culture.DateTimeFormat.GetMonthName(m)</option>
+                    }
+                </select>
+                <select class="dtp-select dtp-year" @onchange="OnYearChanged">
+                    @for (var y = ViewYear - 40; y <= ViewYear + 10; y++)
+                    {
+                        <option value="@y" selected="@(y == ViewYear)">@y.ToString(Culture)</option>
+                    }
+                </select>
+                <button type="button" class="dtp-nav-btn" @onclick="NextMonth" aria-label="@Local["Action.Next"]">
+                    <SvgIcon Name="chevron-right" Size="16" />
+                </button>
+            </div>
+
+            <div class="dtp-weekdays">
+                @foreach (var name in WeekdayNames)
+                {
+                    <span>@name</span>
+                }
+            </div>
+
+            <div class="dtp-grid">
+                @foreach (var cell in Cells)
+                {
+                    <button type="button"
+                            class="dtp-day @(cell.IsCurrentMonth ? "" : "muted") @(cell.IsToday ? "today" : "") @(cell.IsSelected ? "active" : "")"
+                            @onclick="() => SelectDate(cell.Date)">
+                        @cell.Date.Day.ToString(Culture)
+                    </button>
+                }
+            </div>
+
+            <div class="dtp-time">
+                <select class="dtp-select" aria-label="Hour" @onchange="OnHourChanged">
+                    @if (Is12Hour)
+                    {
+                        @for (var h = 1; h <= 12; h++)
+                        {
+                            <option value="@h" selected="@(DisplayHour == h)">@h.ToString(Culture)</option>
+                        }
+                    }
+                    else
+                    {
+                        @for (var h = 0; h <= 23; h++)
+                        {
+                            <option value="@h" selected="@(_model?.Hour == h)">@h.ToString(Culture)</option>
+                        }
+                    }
+                </select>
+                <span class="dtp-colon">:</span>
+                <select class="dtp-select" aria-label="Minute" @onchange="OnMinuteChanged">
+                    @for (var m = 0; m < 60; m++)
+                    {
+                        <option value="@m" selected="@(_model?.Minute == m)">@m.ToString(Culture)</option>
+                    }
+                </select>
+                @if (Is12Hour)
+                {
+                    <select class="dtp-select dtp-ampm" aria-label="AM/PM" @onchange="OnAmPmChanged">
+                        <option value="0" selected="@(AmPm == 0)">@Local["Time.AM"]</option>
+                        <option value="1" selected="@(AmPm == 1)">@Local["Time.PM"]</option>
+                    </select>
+                }
+            </div>
+
+            <div class="dtp-footer">
+                <button type="button" class="btn btn-ghost btn-sm" @onclick="SetNow">
+                    <SvgIcon Name="clock" Size="14" /> @Local["State.Now"]
+                </button>
+                <button type="button" class="btn btn-ghost btn-sm" @onclick="ClearValue">@Local["Action.Clear"]</button>
+                <button type="button" class="btn btn-primary btn-sm" @onclick="Close">@Local["Action.OK"]</button>
+            </div>
+        </span>
+    }
+</span>
+
+
+@code {
+    private bool _open;
+    private DateTime _view = DateTime.Today;
+    private DateTime? _model;
+    private ElementReference _trigger;
+    private ElementReference _popover;
+
+    private CultureInfo Culture => Local.Culture;
+
+    private bool IsInvalid => EditContext?.GetValidationMessages(FieldIdentifier).Any() ?? false;
+
+    protected override void OnParametersSet()
+    {
+        if (Value != _model)
+        {
+            _model = Value ?? DateTime.Today;
+            _view = _model.Value;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_open && _popover.Id is not null)
+        {
+            await JS.InvokeVoidAsync("bf.positionPopover", _trigger, _popover);
+        }
+    }
+
+    protected override bool TryParseValueFromString(string? value, out DateTime? result, out string validationErrorMessage)
+    {
+        if (DateTime.TryParse(value, Culture, DateTimeStyles.None, out var parsed))
+        {
+            result = parsed;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        result = null;
+        validationErrorMessage = "Date is invalid.";
+        return false;
+    }
+
+    private string DisplayText => _model is { } d
+        ? d.TimeOfDay == TimeSpan.Zero ? d.ToString("d", Culture) : d.ToString("g", Culture)
+        : Local["Transaction.SelectDate"];
+
+    private int ViewYear => _view.Year;
+    private int ViewMonth => _view.Month;
+
+    private string[] WeekdayNames
+    {
+        get
+        {
+            var names = Culture.DateTimeFormat.ShortestDayNames;
+            var start = (int)Culture.DateTimeFormat.FirstDayOfWeek;
+            var shifted = new string[7];
+            for (var i = 0; i < 7; i++)
+            {
+                shifted[i] = names[(start + i) % 7];
+            }
+            return shifted;
+        }
+    }
+
+    private IEnumerable<DayCell> Cells
+    {
+        get
+        {
+            var first = new DateTime(ViewYear, ViewMonth, 1);
+            var offset = ((int)first.DayOfWeek - (int)Culture.DateTimeFormat.FirstDayOfWeek + 7) % 7;
+            var cursor = first.AddDays(-offset);
+            var today = DateTime.Today;
+            for (var i = 0; i < 42; i++)
+            {
+                var date = cursor.AddDays(i);
+                yield return new DayCell(date, date.Month == ViewMonth, date == today, _model is { } m && m.Date == date);
+            }
+        }
+    }
+
+    private bool Is12Hour => Culture.DateTimeFormat.ShortTimePattern.IndexOf('t') >= 0;
+
+    private int DisplayHour
+    {
+        get
+        {
+            if (_model is not { } d) return Is12Hour ? 12 : 0;
+            var h = d.Hour % 12;
+            return h == 0 ? 12 : h;
+        }
+    }
+
+    private int AmPm => _model is { Hour: >= 12 } ? 1 : 0;
+
+    private void Apply(DateTime? value)
+    {
+        _model = value;
+        CurrentValue = value;
+        EditContext?.NotifyFieldChanged(FieldIdentifier);
+    }
+
+    private void Toggle() => _open = !_open;
+    private void Close() => _open = false;
+
+    private void SelectDate(DateTime date)
+    {
+        _model = date.Add(_model?.TimeOfDay ?? DateTime.Now.TimeOfDay);
+        Apply(_model);
+    }
+
+    private void PrevMonth() => _view = _view.AddMonths(-1);
+    private void NextMonth() => _view = _view.AddMonths(1);
+
+    private void SetNow() => Apply(DateTime.Now);
+
+    private void ClearValue()
+    {
+        Apply(null);
+        Close();
+    }
+
+    private void OnMonthChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var m)) _view = new DateTime(_view.Year, m, 1);
+    }
+
+    private void OnYearChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var y)) _view = new DateTime(y, _view.Month, 1);
+    }
+
+    private void OnHourChanged(ChangeEventArgs e)
+    {
+        if (!int.TryParse(e.Value?.ToString(), out var hour)) return;
+
+        if (Is12Hour)
+        {
+            var h24 = hour % 12;
+            if (AmPm == 1) h24 += 12;
+            var d = _model ?? DateTime.Today;
+            Apply(d.Date.AddHours(h24).AddMinutes(d.Minute));
+        }
+        else if (_model is { } d)
+        {
+            Apply(d.Date.AddHours(hour).AddMinutes(d.Minute));
+        }
+        else
+        {
+            Apply(DateTime.Today.AddHours(hour));
+        }
+    }
+
+    private void OnMinuteChanged(ChangeEventArgs e)
+    {
+        if (!int.TryParse(e.Value?.ToString(), out var minute)) return;
+        var d = _model ?? DateTime.Today;
+        Apply(d.Date.AddHours(d.Hour).AddMinutes(minute));
+    }
+
+    private void OnAmPmChanged(ChangeEventArgs e)
+    {
+        if (!int.TryParse(e.Value?.ToString(), out var amPm)) return;
+        var d = _model ?? DateTime.Today;
+        var h24 = (d.Hour % 12) + (amPm == 1 ? 12 : 0);
+        Apply(d.Date.AddHours(h24).AddMinutes(d.Minute));
+    }
+
+    private readonly record struct DayCell(DateTime Date, bool IsCurrentMonth, bool IsToday, bool IsSelected);
+}

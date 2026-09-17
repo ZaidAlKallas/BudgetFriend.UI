@@ -1,0 +1,233 @@
+@inherits LocalizedComponentBase
+@page "/categories"
+@attribute [Authorize]
+@inject ICategoryService CategoriesService
+
+<PageHeader Title="@Local["Nav.Categories"]">
+    <button class="btn btn-primary" @onclick="OpenCreate">
+        <SvgIcon Name="plus" Size="16" /> @Local["Category.Create"]
+    </button>
+</PageHeader>
+
+@if (_loading)
+{
+    <LoadingIndicator />
+}
+else if (_error is not null)
+{
+    <ErrorState Error="_error" OnRetry="LoadAsync" />
+}
+else if (_items is null || _items.Count == 0)
+{
+    <EmptyState Text="@Local["State.NoCategories"]">
+        <button class="btn btn-primary" @onclick="OpenCreate">@Local["Category.Create"]</button>
+    </EmptyState>
+}
+else
+{
+    <div class="grid grid-3">
+        @foreach (var category in _items)
+        {
+            <div class="list-item">
+                <div class="grow">
+                    <div class="strong">@category.Name</div>
+                    @if (category.TransactionType is { } type)
+                    {
+                        <span class="chip @(type == TransactionType.Income ? "chip-income" : "chip-expense")">@TypeName(type)</span>
+                    }
+                </div>
+                <button class="btn btn-ghost btn-icon" title="@Local["Action.Edit"]" @onclick="() => OpenEdit(category)">
+                    <SvgIcon Name="pencil" Size="15" />
+                </button>
+                <button class="btn btn-danger-ghost btn-icon" title="@Local["Action.Delete"]" @onclick="() => AskDelete(category)">
+                    <SvgIcon Name="trash" Size="15" />
+                </button>
+            </div>
+        }
+    </div>
+}
+
+@if (_formVisible)
+{
+    <div class="modal-backdrop" @onclick="CloseForm">
+        <div class="modal" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3 class="modal-title">@(_editingId is null ? Local["Category.Create"] : Local["Category.Edit"])</h3>
+                <button class="btn btn-ghost btn-icon" @onclick="CloseForm"><SvgIcon Name="x" Size="18" /></button>
+            </div>
+            <EditForm Model="_form" OnValidSubmit="SaveFormAsync" FormName="category-form">
+                <DataAnnotationsValidator />
+                <div class="field">
+                    <label>@Local["Category.Name"]</label>
+                    <InputText @bind-Value="_form.Name" class="input" />
+                    <ValidationMessage For="() => _form.Name" />
+                </div>
+                <div class="field">
+                    <label>@Local["Category.TransactionType"]</label>
+                    <select class="input" @bind="_form.Type">
+                        <option value="">—</option>
+                        <option value="0">@Local["TxType.Income"]</option>
+                        <option value="1">@Local["TxType.Expense"]</option>
+                    </select>
+                </div>
+                @if (_formError is not null)
+                {
+                    <div class="validation-message" role="alert">@_formError</div>
+                }
+                <div class="form-actions">
+                    <button class="btn btn-ghost" type="button" @onclick="CloseForm" disabled="@_busy">@Local["Action.Cancel"]</button>
+                    <button class="btn btn-primary" type="submit" disabled="@_busy">
+                        @if (_busy)
+                        {
+                            <span class="spinner"></span>
+                        }
+                        @Local["Action.Save"]
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<ConfirmationDialog
+    Visible="_deleteTarget is not null"
+    Title="@Local["Category.Delete"]"
+    Message="@Local["Common.Confirm"]"
+    ConfirmText="@Local["Action.Delete"]"
+    CancelText="@Local["Action.Cancel"]"
+    Busy="_busy"
+    OnConfirm="ConfirmDeleteAsync"
+    OnCancel="CancelDelete" />
+
+@code {
+    private readonly CategoryFormModel _form = new();
+
+    private IReadOnlyList<CategoryDto>? _items;
+    private bool _loading = true;
+    private ApiErrorMessage? _error;
+    private string? _formError;
+    private bool _busy;
+
+    private bool _formVisible;
+    private Guid? _editingId;
+    private CategoryDto? _deleteTarget;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _items = await CategoriesService.GetCategoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void OpenCreate()
+    {
+        _editingId = null;
+        _form.Name = "";
+        _form.Type = null;
+        _formError = null;
+        _formVisible = true;
+    }
+
+    private void OpenEdit(CategoryDto category)
+    {
+        _editingId = category.Id;
+        _form.Name = category.Name;
+        _form.Type = (int?)category.TransactionType;
+        _formError = null;
+        _formVisible = true;
+    }
+
+    private void CloseForm() => _formVisible = false;
+
+    private async Task SaveFormAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        _formError = null;
+        var type = _form.Type is { } t ? (TransactionType)t : TransactionType.Expense;
+
+        try
+        {
+            if (_editingId is { } id)
+            {
+                await CategoriesService.UpdateCategoryAsync(id, new UpdateCategoryRequest(_form.Name!, type));
+            }
+            else
+            {
+                await CategoriesService.CreateCategoryAsync(new CreateCategoryRequest(_form.Name!, type));
+            }
+
+            _formVisible = false;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _formError = BuildFormError(ApiErrorMessage.From(ex));
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void AskDelete(CategoryDto category) => _deleteTarget = category;
+    private void CancelDelete() => _deleteTarget = null;
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_deleteTarget is null || _busy) return;
+        _busy = true;
+        try
+        {
+            await CategoriesService.DeleteCategoryAsync(_deleteTarget.Id);
+            _deleteTarget = null;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private string TypeName(TransactionType type) => type switch
+    {
+        TransactionType.Income => Local["TxType.Income"],
+        _ => Local["TxType.Expense"]
+    };
+
+    private string BuildFormError(ApiErrorMessage error)
+    {
+        if (error.FieldErrors.Count > 0)
+            return string.Join(", ", error.FieldErrors);
+
+        if (!string.IsNullOrWhiteSpace(error.Detail))
+            return error.Detail;
+
+        return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class CategoryFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string? Name { get; set; }
+
+        public int? Type { get; set; }
+    }
+}

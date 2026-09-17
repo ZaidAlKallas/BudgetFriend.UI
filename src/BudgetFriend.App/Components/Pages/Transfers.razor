@@ -1,0 +1,309 @@
+@inherits LocalizedComponentBase
+@page "/transfers"
+@attribute [Authorize]
+@inject ITransferService TransfersService
+@inject IAccountService Accounts
+@inject FinanceFormatter Formatter
+
+<PageHeader Title="@Local["Nav.Transfers"]">
+    <button class="btn btn-primary" @onclick="OpenCreate">
+        <SvgIcon Name="plus" Size="16" /> @Local["Transfer.Create"]
+    </button>
+</PageHeader>
+
+@if (_loading)
+{
+    <LoadingIndicator />
+}
+else if (_error is not null)
+{
+    <ErrorState Error="_error" OnRetry="LoadAsync" />
+}
+else if (_items is null || _items.Count == 0)
+{
+    <EmptyState Text="@Local["State.NoTransfers"]">
+        <button class="btn btn-primary" @onclick="OpenCreate">@Local["Transfer.Create"]</button>
+    </EmptyState>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>@Local["Transfer.Date"]</th>
+                    <th>@Local["Transfer.FromAccount"]</th>
+                    <th></th>
+                    <th>@Local["Transfer.ToAccount"]</th>
+                    <th style="text-align:end;">@Local["Transfer.FromAmount"]</th>
+                    <th style="text-align:end;">@Local["Transfer.ToAmount"]</th>
+                    <th>@Local["Transaction.Note"]</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transfer in _items)
+                {
+                    <tr>
+                        <td class="muted-2 small">@Formatter.ShortDateTime(transfer.TransferDate)</td>
+                        <td class="small strong">@transfer.FromAccountName</td>
+                        <td><span class="chip chip-brand"><SvgIcon Name="arrow-right" Size="13" /></span></td>
+                        <td class="small strong">@transfer.ToAccountName</td>
+                        <td style="text-align:end;" class="money negative small">@Formatter.Currency(-transfer.FromAmount, transfer.FromAccountCurrency)</td>
+                        <td style="text-align:end;" class="money positive small">@Formatter.Currency(transfer.ToAmount, transfer.ToAccountCurrency)</td>
+                        <td class="small muted-2">@(string.IsNullOrWhiteSpace(transfer.Note) ? "—" : transfer.Note)</td>
+                        <td style="text-align:end; white-space:nowrap;">
+                            <button class="btn btn-danger-ghost btn-icon" title="@Local["Action.Delete"]" @onclick="() => AskDelete(transfer)">
+                                <SvgIcon Name="trash" Size="15" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (_formVisible)
+{
+    <div class="modal-backdrop" @onclick="CloseForm">
+        <div class="modal" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3 class="modal-title">@Local["Transfer.Create"]</h3>
+                <button class="btn btn-ghost btn-icon" @onclick="CloseForm"><SvgIcon Name="x" Size="18" /></button>
+            </div>
+            <EditForm Model="_form" OnValidSubmit="SaveFormAsync" FormName="transfer-form">
+                <DataAnnotationsValidator />
+                <div class="grid grid-2" style="gap:10px;">
+                    <div class="field">
+                        <label>@Local["Transfer.FromAccount"]</label>
+                        <InputSelect @bind-Value="_form.FromAccountId" class="input">
+                            <option value="">@Local["Transfer.FromAccount"]</option>
+                            @foreach (var account in _accounts ?? Array.Empty<AccountDto>())
+                            {
+                                <option value="@account.Id">@account.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => _form.FromAccountId" />
+                    </div>
+                    <div class="field">
+                        <label>@Local["Transfer.ToAccount"]</label>
+                        <InputSelect @bind-Value="_form.ToAccountId" class="input">
+                            <option value="">@Local["Transfer.ToAccount"]</option>
+                            @foreach (var account in _accounts ?? Array.Empty<AccountDto>())
+                            {
+                                <option value="@account.Id">@account.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => _form.ToAccountId" />
+                    </div>
+                </div>
+                <div class="grid grid-2" style="gap:10px;">
+                    <div class="field">
+                        <label>@Local["Transfer.FromAmount"]</label>
+                        <InputNumber @bind-Value="_form.FromAmount" class="input" step="0.01" />
+                        <ValidationMessage For="() => _form.FromAmount" />
+                    </div>
+                    <div class="field">
+                        <label>@Local["Transfer.ToAmount"]</label>
+                        <InputNumber @bind-Value="_form.ToAmount" class="input" step="0.01" />
+                        <ValidationMessage For="() => _form.ToAmount" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label>@Local["Transfer.Date"]</label>
+                    <DateTimePicker @bind-Value="_form.Date" />
+                    <ValidationMessage For="() => _form.Date" />
+                </div>
+                <div class="field">
+                    <label>@Local["Transaction.Note"]</label>
+                    <InputText @bind-Value="_form.Note" class="input" />
+                </div>
+                @if (_formError is not null)
+                {
+                    <div class="validation-message" role="alert">@_formError</div>
+                }
+                <div class="form-actions">
+                    <button class="btn btn-ghost" type="button" @onclick="CloseForm" disabled="@_busy">@Local["Action.Cancel"]</button>
+                    <button class="btn btn-primary" type="submit" disabled="@_busy">
+                        @if (_busy)
+                        {
+                            <span class="spinner"></span>
+                        }
+                        @Local["Action.Save"]
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<ConfirmationDialog
+    Visible="_deleteTarget is not null"
+    Title="@Local["Transfer.Delete"]"
+    Message="@Local["Common.Confirm"]"
+    ConfirmText="@Local["Action.Delete"]"
+    CancelText="@Local["Action.Cancel"]"
+    Busy="_busy"
+    OnConfirm="ConfirmDeleteAsync"
+    OnCancel="CancelDelete" />
+
+@code {
+    private readonly TransferFormModel _form = new();
+
+    private IReadOnlyList<AccountDto>? _accounts;
+    private IReadOnlyList<TransferDto>? _items;
+
+    private bool _loading = true;
+    private ApiErrorMessage? _error;
+    private string? _formError;
+    private bool _busy;
+
+    private bool _formVisible;
+    private TransferDto? _deleteTarget;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAccountsAsync();
+        await LoadAsync();
+    }
+
+    private async Task LoadAccountsAsync()
+    {
+        try
+        {
+            _accounts = await Accounts.GetAccountsAsync();
+        }
+        catch
+        {
+            // Form will show an error if the user attempts to create without data.
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _items = await TransfersService.GetTransfersAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void OpenCreate()
+    {
+        _form.FromAccountId = null;
+        _form.ToAccountId = null;
+        _form.FromAmount = 0;
+        _form.ToAmount = 0;
+        _form.Note = "";
+        _form.Date = DateTime.Now;
+        _formError = null;
+        _formVisible = true;
+    }
+
+    private void CloseForm() => _formVisible = false;
+
+    private async Task SaveFormAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        _formError = null;
+        if (_form.FromAccountId == _form.ToAccountId)
+        {
+            _formError = "From and To accounts must differ.";
+            _busy = false;
+            return;
+        }
+
+        try
+        {
+            var transferDate = _form.Date is { } d
+                ? new DateTimeOffset(DateTime.SpecifyKind(d, DateTimeKind.Utc))
+                : DateTimeOffset.UtcNow;
+
+            await TransfersService.CreateTransferAsync(new CreateTransferRequest(
+                _form.FromAccountId!.Value,
+                _form.ToAccountId!.Value,
+                _form.FromAmount,
+                _form.ToAmount,
+                _form.Note,
+                transferDate));
+
+            _formVisible = false;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _formError = BuildFormError(ApiErrorMessage.From(ex));
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void AskDelete(TransferDto transfer) => _deleteTarget = transfer;
+    private void CancelDelete() => _deleteTarget = null;
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_deleteTarget is null || _busy) return;
+        _busy = true;
+        try
+        {
+            await TransfersService.DeleteTransferAsync(_deleteTarget.Id);
+            _deleteTarget = null;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private string BuildFormError(ApiErrorMessage error)
+    {
+        if (error.FieldErrors.Count > 0)
+            return string.Join(", ", error.FieldErrors);
+
+        if (!string.IsNullOrWhiteSpace(error.Detail))
+            return error.Detail;
+
+        return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class TransferFormModel
+    {
+        [Required(ErrorMessage = "Please choose a source account.")]
+        public Guid? FromAccountId { get; set; }
+
+        [Required(ErrorMessage = "Please choose a destination account.")]
+        public Guid? ToAccountId { get; set; }
+
+        [Required(ErrorMessage = "Amount is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        public decimal FromAmount { get; set; }
+
+        [Required(ErrorMessage = "Amount is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        public decimal ToAmount { get; set; }
+
+        [Required(ErrorMessage = "Date is required.")]
+        public DateTime? Date { get; set; }
+
+        public string? Note { get; set; }
+    }
+}

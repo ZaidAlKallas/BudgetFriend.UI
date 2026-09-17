@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BudgetFriend.App.Tests/BudgetFriend.App.Tests.csproj" />
+    <Project Path="src/BudgetFriend.App/BudgetFriend.App.csproj" />
+    <Project Path="src/BudgetFriend.Mobile/BudgetFriend.Mobile.csproj" />
+    <Project Path="src/BudgetFriend.Web/BudgetFriend.Web.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,490 @@
+@inherits LocalizedComponentBase
+@page "/transactions"
+@attribute [Authorize]
+@inject ITransactionService TransactionsService
+@inject IAccountService Accounts
+@inject ICategoryService Categories
+@inject IPreferenceStore Preferences
+@inject FinanceFormatter Formatter
+
+<PageHeader Title="@Local["Nav.Transactions"]">
+    <button class="btn btn-primary" @onclick="OpenCreate">
+        <SvgIcon Name="plus" Size="16" /> @Local["Transaction.Create"]
+    </button>
+</PageHeader>
+
+<div class="card" style="margin-bottom:18px; padding:12px;">
+    <button class="filters-toggle" @onclick="ToggleFiltersAsync" aria-expanded="@(!_filtersCollapsed)">
+        <span style="display:inline-flex; align-items:center; gap:8px;">
+            <SvgIcon Name="filter" Size="16" /> @Local["Transaction.Filter"]
+        </span>
+        @if (_filtersCollapsed)
+        {
+            <SvgIcon Name="chevron-down" Size="16" />
+        }
+        else
+        {
+            <SvgIcon Name="x" Size="16" />
+        }
+    </button>
+    <div class="toolbar filter-fields @(_filtersCollapsed ? "collapsed" : "")" style="margin:10px 0 2px;">
+        <div class="field" style="margin:0; flex:1; min-width:130px;">
+            <select class="input" @bind="_accountFilter" @bind:after="ApplyFiltersAsync">
+                <option value="">@Local["Transaction.Account"]</option>
+                @foreach (var account in _accounts ?? Array.Empty<AccountDto>())
+                {
+                    <option value="@account.Id">@account.Name</option>
+                }
+            </select>
+        </div>
+        <div class="field" style="margin:0; flex:1; min-width:130px;">
+            <select class="input" @bind="_categoryFilter" @bind:after="ApplyFiltersAsync">
+                <option value="">@Local["Transaction.Category"]</option>
+                @foreach (var category in FilterCategories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+        </div>
+        <div class="field" style="margin:0; flex:1; min-width:130px;">
+            <select class="input" @bind="_typeFilter" @bind:after="ApplyFiltersAsync">
+                <option value="">@Local["Transaction.Filter"]</option>
+                <option value="0">@Local["TxType.Income"]</option>
+                <option value="1">@Local["TxType.Expense"]</option>
+            </select>
+        </div>
+        <div class="field" style="margin:0; flex:1; min-width:160px;">
+            <DateTimePicker @bind-Value="_dateFrom" @bind-Value:after="ApplyFiltersAsync" />
+        </div>
+        <div class="field" style="margin:0; flex:1; min-width:160px;">
+            <DateTimePicker @bind-Value="_dateTo" @bind-Value:after="ApplyFiltersAsync" />
+        </div>
+        <div class="field" style="margin:0; flex:2; min-width:160px;">
+            <input class="input" placeholder="@Local["Action.Search"]" @bind="_search" @bind:after="ApplyFiltersAsync" />
+        </div>
+    </div>
+</div>
+
+@if (_loading)
+{
+    <LoadingIndicator />
+}
+else if (_error is not null)
+{
+    <ErrorState Error="_error" OnRetry="LoadAsync" />
+}
+else if (_result is null || _result.TotalCount == 0)
+{
+    <EmptyState Text="@Local["State.NoTransactions"]">
+        <button class="btn btn-primary" @onclick="OpenCreate">@Local["Transaction.Create"]</button>
+    </EmptyState>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>@Local["Transaction.Date"]</th>
+                    <th>@Local["Transaction.Note"]</th>
+                    <th>@Local["Transaction.Category"]</th>
+                    <th>@Local["Transaction.Account"]</th>
+                    <th style="text-align:end;">@Local["Transaction.Amount"]</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tx in _result.Items)
+                {
+                    var txType = tx.TransactionType;
+                    var isTransfer = txType is TransactionType.TransferIn or TransactionType.TransferOut;
+                    <tr class="@(isTransfer ? "tx-row-transfer" : "")">
+                        <td class="muted-2 small">@Formatter.ShortDateTime(tx.TransactionDate)</td>
+                        <td class="small">@(string.IsNullOrWhiteSpace(tx.Note) ? "—" : tx.Note)</td>
+                        <td class="small">
+                            @if (isTransfer)
+                            {
+                                <span class="chip chip-transfer"><SvgIcon Name="transfer" Size="12" /> @TypeName(txType)</span>
+                            }
+                            else if (tx.CategoryName is not null)
+                            {
+                                <span class="chip chip-brand">@tx.CategoryName</span>
+                            }
+                            else
+                            {
+                                <span class="muted-2">—</span>
+                            }
+                        </td>
+                        <td class="small">@tx.AccountName</td>
+                        <td style="text-align:end;">
+                            <span class="money @(tx.TransactionType == TransactionType.Expense || tx.TransactionType == TransactionType.TransferOut ? "negative" : "positive")">@Formatter.Currency(SignedAmount(tx), tx.Currency)</span>
+                        </td>
+                        <td style="text-align:end; white-space:nowrap;">
+                        @if(!isTransfer){
+                            <button class="btn btn-ghost btn-icon" title="@Local["Action.Edit"]" @onclick="() => OpenEdit(tx)">
+                                <SvgIcon Name="pencil" Size="15" />
+                            </button>
+                            <button class="btn btn-danger-ghost btn-icon" title="@Local["Action.Delete"]" @onclick="() => AskDelete(tx)">
+                                <SvgIcon Name="trash" Size="15" />
+                            </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <Pagination PageNumber="_result.PageNumber" TotalPages="_result.TotalPages" OnPageChanged="GoToPageAsync" />
+}
+
+@if (_formVisible)
+{
+    <div class="modal-backdrop" @onclick="CloseForm">
+        <div class="modal" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3 class="modal-title">@(_editingId is null ? Local["Transaction.Create"] : Local["Transaction.Edit"])</h3>
+                <button class="btn btn-ghost btn-icon" @onclick="CloseForm"><SvgIcon Name="x" Size="18" /></button>
+            </div>
+            <EditForm Model="_form" OnValidSubmit="SaveFormAsync" FormName="transaction-form">
+                <DataAnnotationsValidator />
+                <div class="field">
+                    <label>@Local["TxType.Income"] / @Local["TxType.Expense"]</label>
+                    <div class="segmented">
+                        <button type="button" class="@(_form.IsIncome ? "active" : "")" @onclick="() => SelectType(true)">
+                            @Local["TxType.Income"]
+                        </button>
+                        <button type="button" class="@(!_form.IsIncome ? "active" : "")" @onclick="() => SelectType(false)">
+                            @Local["TxType.Expense"]
+                        </button>
+                    </div>
+                </div>
+                @if (_editingId is null)
+                {
+                    <div class="field">
+                        <label>@Local["Transaction.Account"]</label>
+                        <InputSelect @bind-Value="_form.AccountId" class="input">
+                            <option value="">@Local["Transaction.Account"]</option>
+                            @foreach (var account in _accounts ?? Array.Empty<AccountDto>())
+                            {
+                                <option value="@account.Id">@account.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => _form.AccountId" />
+                    </div>
+                    <div class="field">
+                        <label>@Local["Transaction.Category"]</label>
+                        <InputSelect @bind-Value="_form.CategoryId" class="input">
+                            <option value="">@Local["Action.Clear"]</option>
+                            @foreach (var category in FormCategories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+                }
+                <div class="field">
+                    <label>@Local["Transaction.Amount"]</label>
+                    <InputNumber @bind-Value="_form.Amount" class="input" step="0.01" />
+                    <ValidationMessage For="() => _form.Amount" />
+                </div>
+                <div class="field">
+                    <label>@Local["Transaction.Date"]</label>
+                    <DateTimePicker @bind-Value="_form.Date" />
+                    <ValidationMessage For="() => _form.Date" />
+                </div>
+                <div class="field">
+                    <label>@Local["Transaction.Note"]</label>
+                    <InputText @bind-Value="_form.Note" class="input" />
+                </div>
+                @if (_formError is not null)
+                {
+                    <div class="validation-message" role="alert">@_formError</div>
+                }
+                <div class="form-actions">
+                    <button class="btn btn-ghost" type="button" @onclick="CloseForm" disabled="@_busy">@Local["Action.Cancel"]</button>
+                    <button class="btn btn-primary" type="submit" disabled="@_busy">
+                        @if (_busy)
+                        {
+                            <span class="spinner"></span>
+                        }
+                        @Local["Action.Save"]
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<ConfirmationDialog
+    Visible="_deleteTarget is not null"
+    Title="@Local["Transaction.Delete"]"
+    Message="@Local["Common.Confirm"]"
+    ConfirmText="@Local["Action.Delete"]"
+    CancelText="@Local["Action.Cancel"]"
+    Busy="_busy"
+    OnConfirm="ConfirmDeleteAsync"
+    OnCancel="CancelDelete" />
+
+@code {
+    private readonly TransactionFormModel _form = new();
+
+    private IReadOnlyList<AccountDto>? _accounts;
+    private IReadOnlyList<CategoryDto>? _categories;
+    private PagedResult<TransactionDto>? _result;
+
+    private bool _loading = true;
+    private ApiErrorMessage? _error;
+    private string? _formError;
+    private bool _busy;
+
+    private Guid? _accountFilter;
+    private Guid? _categoryFilter;
+    private int? _typeFilter;
+    private DateTime? _dateFrom;
+    private DateTime? _dateTo;
+    private string _search = "";
+
+    private int _pageNumber = 1;
+    private const int PageSize = 20;
+
+    private bool _formVisible;
+    private Guid? _editingId;
+    private TransactionDto? _deleteTarget;
+    private bool _filtersCollapsed = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var stored = await Preferences.GetAsync(IPreferenceStore.FiltersCollapsedKey).ConfigureAwait(false);
+        if (stored is not null)
+        {
+            _filtersCollapsed = stored == "1";
+        }
+
+        await LoadMetadataAsync();
+        await LoadAsync();
+    }
+
+    private async Task ToggleFiltersAsync()
+    {
+        _filtersCollapsed = !_filtersCollapsed;
+        try
+        {
+            await Preferences.SetAsync(IPreferenceStore.FiltersCollapsedKey, _filtersCollapsed ? "1" : "0").ConfigureAwait(false);
+        }
+        catch
+        {
+            // Persisting the toggle is best-effort; the in-memory state still applies.
+        }
+    }
+
+    private async Task LoadMetadataAsync()
+    {
+        try
+        {
+            var accountsTask = Accounts.GetAccountsAsync();
+            var categoriesTask = Categories.GetCategoriesAsync();
+            await Task.WhenAll(accountsTask, categoriesTask);
+            _accounts = await accountsTask;
+            _categories = await categoriesTask;
+        }
+        catch
+        {
+            // Filters are optional; the table load reports errors below.
+        }
+    }
+
+    private Task ApplyFiltersAsync()
+    {
+        _pageNumber = 1;
+        return LoadAsync();
+    }
+
+    private IReadOnlyList<CategoryDto> FormCategories => CategoriesFor(_form.IsIncome ? TransactionType.Income : TransactionType.Expense);
+
+    private IReadOnlyList<CategoryDto> FilterCategories =>
+        _typeFilter is { } t ? CategoriesFor((TransactionType)t) : _categories ?? Array.Empty<CategoryDto>();
+
+    private IReadOnlyList<CategoryDto> CategoriesFor(TransactionType type) =>
+        (_categories ?? Array.Empty<CategoryDto>())
+            .Where(c => c.TransactionType is null || c.TransactionType == type)
+            .ToList();
+
+    private string TypeName(TransactionType type) => type switch
+    {
+        TransactionType.Income => Local["TxType.Income"],
+        TransactionType.Expense => Local["TxType.Expense"],
+        TransactionType.TransferIn => Local["TxType.TransferIn"],
+        _ => Local["TxType.TransferOut"]
+    };
+
+    private static decimal SignedAmount(TransactionDto tx) =>
+        tx.TransactionType is TransactionType.Income or TransactionType.TransferIn ? tx.Amount : -tx.Amount;
+
+    private void SelectType(bool isIncome)
+    {
+        _form.IsIncome = isIncome;
+        if (_form.CategoryId is { } id &&
+            CategoriesFor(isIncome ? TransactionType.Income : TransactionType.Expense).All(c => c.Id != id))
+        {
+            _form.CategoryId = null;
+        }
+    }
+
+    private Task GoToPageAsync(int page)
+    {
+        _pageNumber = page;
+        return LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _result = await TransactionsService.GetTransactionsAsync(new TransactionQuery(
+                PageNumber: _pageNumber,
+                PageSize: PageSize,
+                AccountId: _accountFilter,
+                CategoryId: _categoryFilter,
+                TransactionType: _typeFilter is { } t ? (TransactionType)t : null,
+                DateFrom: _dateFrom is { } df ? new DateTimeOffset(df, TimeSpan.Zero) : null,
+                DateTo: _dateTo is { } dt ? new DateTimeOffset(dt, TimeSpan.Zero).AddDays(1).AddTicks(-1) : null,
+                Search: _search));
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void OpenCreate()
+    {
+        _editingId = null;
+        _form.IsIncome = false;
+        _form.Amount = 0;
+        _form.Note = "";
+        _form.Date = DateTime.Now;
+        _form.AccountId = _accountFilter ?? _accounts?.FirstOrDefault()?.Id;
+        _form.CategoryId = null;
+        _formError = null;
+        _formVisible = true;
+    }
+
+    private void OpenEdit(TransactionDto tx)
+    {
+        _editingId = tx.Id;
+        _form.IsIncome = tx.TransactionType is TransactionType.Income or TransactionType.TransferIn;
+        _form.Amount = Math.Abs(tx.Amount);
+        _form.Note = tx.Note;
+        _form.Date = tx.TransactionDate.UtcDateTime;
+        _form.AccountId = tx.AccountId;
+        _form.CategoryId = tx.CategoryId is { } cid &&
+            (_categories ?? Array.Empty<CategoryDto>()).FirstOrDefault(c => c.Id == cid) is { } cat &&
+            (cat.TransactionType is null || cat.TransactionType == (_form.IsIncome ? TransactionType.Income : TransactionType.Expense))
+                ? cid
+                : null;
+        _formError = null;
+        _formVisible = true;
+    }
+
+    private void CloseForm() => _formVisible = false;
+
+    private async Task SaveFormAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        _formError = null;
+        try
+        {
+        var amount = Math.Abs(_form.Amount);
+var transactionType = _form.IsIncome ? TransactionType.Income : TransactionType.Expense;
+var utcDate = _form.Date is { } d
+            ? new DateTimeOffset(DateTime.SpecifyKind(d, DateTimeKind.Utc))
+            : DateTimeOffset.UtcNow;
+
+            if (_editingId is { } id)
+            {
+                await TransactionsService.UpdateTransactionAsync(id, new UpdateTransactionRequest(amount, transactionType, _form.Note, utcDate));
+            }
+            else
+            {
+                await TransactionsService.CreateTransactionAsync(new CreateTransactionRequest(
+                    _form.AccountId!.Value,
+                    _form.CategoryId,
+                    amount,
+                    transactionType,
+                    _form.Note,
+                    utcDate));
+            }
+
+            _formVisible = false;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _formError = BuildFormError(ApiErrorMessage.From(ex));
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void AskDelete(TransactionDto tx) => _deleteTarget = tx;
+    private void CancelDelete() => _deleteTarget = null;
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_deleteTarget is null || _busy) return;
+        _busy = true;
+        try
+        {
+            await TransactionsService.DeleteTransactionAsync(_deleteTarget.Id);
+            _deleteTarget = null;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private string BuildFormError(ApiErrorMessage error)
+    {
+        if (error.FieldErrors.Count > 0)
+            return string.Join(", ", error.FieldErrors);
+
+        if (!string.IsNullOrWhiteSpace(error.Detail))
+            return error.Detail;
+
+        return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class TransactionFormModel
+    {
+        public bool IsIncome { get; set; }
+
+        [Required(ErrorMessage = "Please choose an account.")]
+        public Guid? AccountId { get; set; }
+
+        public Guid? CategoryId { get; set; }
+
+        [Required(ErrorMessage = "Amount is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        public decimal Amount { get; set; }
+
+        [Required(ErrorMessage = "Date is required.")]
+        public DateTime? Date { get; set; }
+
+        public string? Note { get; set; }
+    }
+}

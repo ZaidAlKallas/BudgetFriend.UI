@@ -1,0 +1,13 @@
+@inject LocalizationService Local
+
+<div class="state" role="status" aria-live="polite">
+    <div class="bars" aria-hidden="true"><span></span><span></span><span></span></div>
+    <span class="small muted">@DisplayText</span>
+</div>
+
+@code {
+    [Parameter]
+    public string? Text { get; set; }
+
+    private string DisplayText => string.IsNullOrWhiteSpace(Text) ? Local["State.Loading"] : Text;
+}

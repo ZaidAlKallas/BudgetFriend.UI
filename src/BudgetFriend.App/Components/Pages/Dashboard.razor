@@ -1,0 +1,155 @@
+@inherits LocalizedComponentBase
+@page "/"
+@attribute [Authorize]
+@inject IDashboardService DashboardService
+@inject FinanceFormatter Formatter
+
+<PageHeader Title="@Local["Dashboard.Overview"]">
+</PageHeader>
+
+@if (_loading)
+{
+    <LoadingIndicator />
+}
+else if (_error is not null)
+{
+    <ErrorState Error="_error" OnRetry="LoadAsync" />
+}
+else if (_overview is null)
+{
+    <EmptyState Text="@Local["State.Empty"]" />
+}
+else
+{
+    @foreach (var currency in _overview.CurrencyBreakdown)
+    {
+        <div class="grid grid-4" style="margin-bottom: 8px;">
+            <StatCard Label="@Local["Dashboard.TotalBalance"]">
+                <MoneyDisplay Amount="currency.TotalBalance" Currency="@currency.Currency" />
+            </StatCard>
+            <StatCard Label="@Local["Dashboard.MonthlyIncome"]">
+                <MoneyDisplay Amount="currency.MonthlyIncome" Currency="@currency.Currency" Colorize="false" />
+            </StatCard>
+            <StatCard Label="@Local["Dashboard.MonthlyExpenses"]">
+                <MoneyDisplay Amount="-currency.MonthlyExpenses" Currency="@currency.Currency" Colorize="false" />
+            </StatCard>
+            <StatCard Label="@Local["Dashboard.NetAmount"]">
+                <MoneyDisplay Amount="currency.NetMonthlyIncome" Currency="@currency.Currency" />
+            </StatCard>
+        </div>
+    }
+
+    @if (_overview.Accounts.Count > 0)
+    {
+        <h2 class="card-title" style="margin: 24px 0 12px;">@Local["Nav.Accounts"]</h2>
+        <div class="grid grid-3">
+            @foreach (var account in _overview.Accounts)
+            {
+                <div class="card stat">
+                    <span class="stat-label">@account.Name</span>
+                    <span class="stat-value" style="font-size:1.25rem;">
+                        <MoneyDisplay Amount="account.Balance" Currency="@account.Currency" Colorize="false" />
+                    </span>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="grid grid-2" style="margin-top: 24px;">
+        <div class="card">
+            <h2 class="card-title">@Local["Dashboard.RecentTransactions"]</h2>
+            @if (_overview.RecentTransactions.Count == 0)
+            {
+                <EmptyState Text="@Local["State.NoTransactions"]" />
+            }
+            else
+            {
+                <div class="list">
+                    @foreach (var tx in _overview.RecentTransactions)
+                    {
+                        <div class="list-item">
+                            <div class="grow">
+                                <div class="strong small">@(string.IsNullOrWhiteSpace(tx.Note) ? tx.AccountName : tx.Note)</div>
+                                <div class="muted tiny">@tx.AccountName · @Formatter.ShortDate(tx.TransactionDate)</div>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                                <MoneyDisplay Amount="SignedAmount(tx)" Currency="@tx.Currency" />
+                                @if (tx.TransactionType is { } type)
+                                {
+                                    <span class="chip @(type == TransactionType.Income ? "chip-income" : type == TransactionType.Expense ? "chip-expense" : type is TransactionType.TransferIn or TransactionType.TransferOut ? "chip-transfer" : "")">
+                                        @TypeName(type)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">@Local["Dashboard.TopCategories"]</h2>
+            @if (_overview.FrequentExpenseCategories.Count == 0)
+            {
+                <EmptyState Text="@Local["State.NoCategories"]" />
+            }
+            else
+            {
+                var overallTotal = _overview.FrequentExpenseCategories.Sum(c => c.AmountsByCurrency.Sum(a => -a.TotalAmount));
+                <div class="list">
+                    @foreach (var category in _overview.FrequentExpenseCategories)
+                    {
+                        var total = category.AmountsByCurrency.Sum(a => -a.TotalAmount);
+                        <div>
+                            <div class="small strong" style="display:flex; justify-content:space-between; gap:8px;">
+                                <span>@category.CategoryName</span>
+                                <MoneyDisplay Amount="-total" Colorize="false" ShowCurrency="false" />
+                            </div>
+                            <ProgressBar Value="total" Max="@(overallTotal > 0 ? overallTotal : 1)" />
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private DashboardOverview? _overview;
+    private bool _loading = true;
+    private ApiErrorMessage? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _overview = await DashboardService.GetOverviewAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private string TypeName(TransactionType type) => type switch
+    {
+        TransactionType.Income => Local["TxType.Income"],
+        TransactionType.Expense => Local["TxType.Expense"],
+        TransactionType.TransferIn => Local["TxType.TransferIn"],
+        _ => Local["TxType.TransferOut"]
+    };
+
+    private static decimal SignedAmount(DashboardTransactionDto tx) =>
+        tx.TransactionType is TransactionType.Income or TransactionType.TransferIn ? tx.Amount : -tx.Amount;
+}

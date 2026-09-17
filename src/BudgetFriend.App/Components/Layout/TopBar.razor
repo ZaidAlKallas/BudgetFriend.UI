@@ -1,0 +1,65 @@
+@inject LocalizationService Local
+@inject ThemeService Theme
+@implements IDisposable
+
+<header class="topbar">
+    <div class="brand topbar-brand">
+        <span class="logo">B</span>
+        <span>BudgetFriend</span>
+    </div>
+    <div class="topbar-actions">
+        <button class="btn btn-ghost btn-icon" title="@Local["Settings.Theme"]" @onclick="CycleTheme">
+            @if (Theme.SelectedTheme == AppTheme.Light)
+            {
+                <SvgIcon Name="sun" Size="18" />
+            }
+            else if (Theme.SelectedTheme == AppTheme.Dark)
+            {
+                <SvgIcon Name="moon" Size="18" />
+            }
+            else
+            {
+                <SvgIcon Name="monitor" Size="18" />
+            }
+        </button>
+        <button class="btn btn-ghost" title="@Local["Settings.Language"]" @onclick="CycleLanguage" style="height:38px; padding:0 12px; gap:6px;">
+            <SvgIcon Name="globe" Size="16" />
+            <span class="small" style="font-weight:700;">@Local.LanguageCode.ToUpperInvariant()</span>
+        </button>
+        <NavLink class="btn btn-ghost btn-icon" href="/settings" Match="@NavLinkMatch.Prefix">
+            <SvgIcon Name="gear" Size="18" />
+        </NavLink>
+    </div>
+</header>
+
+@code {
+    private readonly (string Href, string Key, string Icon, NavLinkMatch Match)[] _links =
+    {
+        ("/", "Nav.Dashboard", "grid", NavLinkMatch.All),
+        ("/accounts", "Nav.Accounts", "wallet", NavLinkMatch.Prefix),
+        ("/transactions", "Nav.Transactions", "list", NavLinkMatch.Prefix),
+        ("/transfers", "Nav.Transfers", "transfer", NavLinkMatch.Prefix),
+        ("/categories", "Nav.Categories", "tag", NavLinkMatch.Prefix),
+        ("/settings", "Nav.Settings", "gear", NavLinkMatch.Prefix),
+    };
+
+    protected override void OnInitialized() => Local.LanguageChanged += OnLanguageChanged;
+
+    private void OnLanguageChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Local.LanguageChanged -= OnLanguageChanged;
+
+    private async Task CycleTheme()
+    {
+        var next = Theme.SelectedTheme switch
+        {
+            AppTheme.Light => AppTheme.Dark,
+            AppTheme.Dark => AppTheme.System,
+            _ => AppTheme.Light
+        };
+        await Theme.SetThemeAsync(next);
+    }
+
+    private Task CycleLanguage() =>
+        Local.SetLanguage(Local.LanguageCode == "ar" ? LocalizationService.English : LocalizationService.Arabic);
+}

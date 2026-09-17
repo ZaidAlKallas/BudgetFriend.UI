@@ -1,0 +1,334 @@
+@inherits LocalizedComponentBase
+@page "/accounts"
+@attribute [Authorize]
+@inject IAccountService AccountsService
+@inject FinanceFormatter Formatter
+
+<PageHeader Title="@Local["Nav.Accounts"]">
+    <button class="btn btn-primary" @onclick="OpenCreate">
+        <SvgIcon Name="plus" Size="16" /> @Local["Account.Create"]
+    </button>
+</PageHeader>
+
+@if (_loading)
+{
+    <LoadingIndicator />
+}
+else if (_error is not null)
+{
+    <ErrorState Error="_error" OnRetry="LoadAsync" />
+}
+else if (_accounts is null || _accounts.Count == 0)
+{
+    <EmptyState Text="@Local["State.NoAccounts"]">
+        <button class="btn btn-primary" @onclick="OpenCreate">@Local["Account.Create"]</button>
+    </EmptyState>
+}
+else
+{
+    <div class="grid grid-3">
+        @foreach (var account in _accounts)
+        {
+            <div class="card stat">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                    <div style="min-width:0;">
+                        <div class="stat-label" style="text-transform:none; letter-spacing:0;">@account.Name</div>
+                        <div class="muted tiny">@account.Currency</div>
+                    </div>
+                    <div style="display:flex; gap:4px;">
+                        <button class="btn btn-ghost btn-icon" title="@Local["Action.Edit"]" @onclick="() => OpenEdit(account)">
+                            <SvgIcon Name="pencil" Size="15" />
+                        </button>
+                        <button class="btn btn-danger-ghost btn-icon" title="@Local["Action.Delete"]" @onclick="() => AskDelete(account)">
+                            <SvgIcon Name="trash" Size="15" />
+                        </button>
+                    </div>
+                </div>
+                <span class="stat-value" style="font-size:1.35rem;">
+                    <MoneyDisplay Amount="account.CurrentBalance" Currency="@account.Currency" Colorize="false" />
+                </span>
+                <div class="muted tiny">
+                    @Local["Account.InitialBalance"]: @Formatter.Currency(account.InitialBalance, account.Currency)
+                </div>
+                <button class="btn btn-outline btn-sm" @onclick="() => OpenDetail(account.Id)">
+                    @Local["Account.Transactions"]
+                </button>
+            </div>
+        }
+    </div>
+}
+
+@if (_formVisible)
+{
+    <div class="modal-backdrop" @onclick="CloseForm">
+        <div class="modal" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3 class="modal-title">@(_editingId is null ? Local["Account.Create"] : Local["Account.Edit"])</h3>
+                <button class="btn btn-ghost btn-icon" @onclick="CloseForm"><SvgIcon Name="x" Size="18" /></button>
+            </div>
+            <EditForm Model="_form" OnValidSubmit="SaveFormAsync" FormName="account-form">
+                <DataAnnotationsValidator />
+                <div class="field">
+                    <label>@Local["Account.Name"]</label>
+                    <InputText @bind-Value="_form.Name" class="input" />
+                    <ValidationMessage For="() => _form.Name" />
+                </div>
+                <div class="field">
+                    <label>@Local["Account.InitialBalance"]</label>
+                    <InputNumber @bind-Value="_form.InitialBalance" class="input" />
+                    <ValidationMessage For="() => _form.InitialBalance" />
+                </div>
+                @if(_editingId is null)
+                {
+                    <div class="field">
+                        <label>@Local["Account.Currency"]</label>
+                        <select class="input" @bind="_form.Currency">
+                            @foreach (var currencyCode in _currencies)
+                            {
+                                <option value="@currencyCode">@currencyCode</option>
+                            }
+                        </select>
+                    </div>
+                }
+                @if (_formError is not null)
+                {
+                    <div class="validation-message" role="alert">@_formError</div>
+                }
+                <div class="form-actions">
+                    <button class="btn btn-ghost" type="button" @onclick="CloseForm" disabled="@_busy">@Local["Action.Cancel"]</button>
+                    <button class="btn btn-primary" type="submit" disabled="@_busy">
+                        @if (_busy)
+                        {
+                            <span class="spinner"></span>
+                        }
+                        @Local["Action.Save"]
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<ConfirmationDialog
+    Visible="_deleteTarget is not null"
+    Title="@Local["Account.Delete"]"
+    Message="@Local["Common.Confirm"]"
+    ConfirmText="@Local["Action.Delete"]"
+    CancelText="@Local["Action.Cancel"]"
+    Busy="_busy"
+    OnConfirm="ConfirmDeleteAsync"
+    OnCancel="CancelDelete" />
+
+@if (_detail is not null)
+{
+    <div class="modal-backdrop" @onclick="CloseDetail">
+        <div class="modal" style="max-width:640px;" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3 class="modal-title">@_detail.Name — @Local["Account.Details"]</h3>
+                <button class="btn btn-ghost btn-icon" @onclick="CloseDetail"><SvgIcon Name="x" Size="18" /></button>
+            </div>
+            <div class="stat" style="margin-bottom:16px;">
+                <span class="stat-label">@Local["Account.CurrentBalance"]</span>
+                <span class="stat-value" style="font-size:1.3rem;">
+                    <MoneyDisplay Amount="_detail.CurrentBalance" Currency="@_detail.Currency" Colorize="false" />
+                </span>
+            </div>
+            @if (_detail.Transactions.TotalCount == 0)
+            {
+                <EmptyState Text="@Local["State.NoTransactions"]" />
+            }
+            else
+            {
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>@Local["Transaction.Date"]</th>
+                                <th>@Local["Transaction.Note"]</th>
+                                <th style="text-align:end;">@Local["Transaction.Amount"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var tx in _detail.Transactions.Items)
+                            {
+                                var txType = tx.TransactionType;
+                                var isTransfer = txType is TransactionType.TransferIn or TransactionType.TransferOut;
+                                <tr class="@(isTransfer ? "tx-row-transfer" : "")">
+                                    <td class="muted-2 small">@Formatter.ShortDateTime(tx.TransactionDate)</td>
+                                    <td class="small">
+                                        @if (isTransfer)
+                                        {
+                                            <span class="chip chip-transfer"><SvgIcon Name="transfer" Size="12" /> @TypeName(txType)</span>
+                                        }
+                                        @(string.IsNullOrWhiteSpace(tx.Note) ? tx.CategoryName ?? "—" : tx.Note)
+                                    </td>
+                                    <td style="text-align:end;"><MoneyDisplay Amount="SignedAmount(tx)" Currency="tx.Currency" ShowCurrency="false" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private static readonly Currency[] _currencies = Enum.GetValues<Currency>();
+
+    private readonly AccountFormModel _form = new();
+    private IReadOnlyList<AccountDto>? _accounts;
+    private bool _loading = true;
+    private ApiErrorMessage? _error;
+    private string? _formError;
+    private bool _busy;
+
+    private bool _formVisible;
+    private Guid? _editingId;
+    private AccountDto? _deleteTarget;
+    private AccountDetailResponse? _detail;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _accounts = await AccountsService.GetAccountsAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void OpenCreate()
+    {
+        _editingId = null;
+        _form.Name = "";
+        _form.InitialBalance = 0;
+        _form.Currency = _currencies[0];
+        _formError = null;
+        _formVisible = true;
+    }
+
+    private void OpenEdit(AccountDto account)
+    {
+        _editingId = account.Id;
+        _form.Name = account.Name;
+        _form.InitialBalance = account.InitialBalance;
+        _form.Currency = account.Currency;
+        _formError = null;
+        _formVisible = true;
+    }
+
+    private void CloseForm() => _formVisible = false;
+
+    private async Task SaveFormAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        _formError = null;
+        try
+        {
+            if (_editingId is { } id)
+            {
+                await AccountsService.UpdateAccountAsync(id, new UpdateAccountRequest(_form.Name!, _form.InitialBalance));
+            }
+            else
+            {
+                await AccountsService.CreateAccountAsync(new CreateAccountRequest(_form.Name!, _form.InitialBalance, _form.Currency!.Value));
+            }
+
+            _formVisible = false;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            var error = ApiErrorMessage.From(ex);
+            _formError = BuildFormError(error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void AskDelete(AccountDto account) => _deleteTarget = account;
+    private void CancelDelete() => _deleteTarget = null;
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (_deleteTarget is null || _busy) return;
+        _busy = true;
+        try
+        {
+            await AccountsService.DeleteAccountAsync(_deleteTarget.Id);
+            _deleteTarget = null;
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task OpenDetail(Guid id)
+    {
+        try
+        {
+            _detail = await AccountsService.GetAccountDetailAsync(id, new TransactionQuery(PageSize: 100));
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+    }
+
+    private void CloseDetail() => _detail = null;
+
+    private string TypeName(TransactionType type) => type switch
+    {
+        TransactionType.Income => Local["TxType.Income"],
+        TransactionType.Expense => Local["TxType.Expense"],
+        TransactionType.TransferIn => Local["TxType.TransferIn"],
+        _ => Local["TxType.TransferOut"]
+    };
+
+    private static decimal SignedAmount(TransactionDto tx) =>
+        tx.TransactionType is TransactionType.Income or TransactionType.TransferIn ? tx.Amount : -tx.Amount;
+
+    private string BuildFormError(ApiErrorMessage error)
+    {
+        if (error.FieldErrors.Count > 0)
+        {
+            return string.Join(", ", error.FieldErrors);
+        }
+
+        if (!string.IsNullOrWhiteSpace(error.Detail))
+        {
+            return error.Detail;
+        }
+
+        return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class AccountFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string? Name { get; set; }
+
+        public decimal InitialBalance { get; set; }
+        public Currency? Currency { get; set; }
+    }
+}

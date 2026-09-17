@@ -1,0 +1,68 @@
+@inject LocalizationService Local
+
+@if (Visible)
+{
+    <div class="modal-backdrop" @onclick="OnBackdropClick">
+        <div class="modal" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3 class="modal-title">@DisplayTitle</h3>
+                <button class="btn btn-ghost btn-icon" aria-label="@Local["Action.Cancel"]" @onclick="OnCancel" disabled="@Busy">
+                    <SvgIcon Name="x" Size="18" />
+                </button>
+            </div>
+            <div>@Message</div>
+            @ChildContent
+            <div class="form-actions">
+                <button class="btn btn-ghost" @onclick="OnCancel" disabled="@Busy">@DisplayCancelText</button>
+                <button class="btn btn-danger" @onclick="OnConfirm" disabled="@Busy">
+                    @if (Busy)
+                    {
+                        <span class="spinner"></span>
+                    }
+                    @DisplayConfirmText
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Message { get; set; } = "";
+
+    [Parameter]
+    public string? ConfirmText { get; set; }
+
+    [Parameter]
+    public string? CancelText { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    private string DisplayTitle => string.IsNullOrWhiteSpace(Title) ? Local["Common.Confirm"] : Title;
+    private string DisplayConfirmText => string.IsNullOrWhiteSpace(ConfirmText) ? Local["Action.Confirm"] : ConfirmText;
+    private string DisplayCancelText => string.IsNullOrWhiteSpace(CancelText) ? Local["Action.Cancel"] : CancelText;
+
+    private void OnBackdropClick()
+    {
+        if (!Busy)
+        {
+            OnCancel.InvokeAsync();
+        }
+    }
+}

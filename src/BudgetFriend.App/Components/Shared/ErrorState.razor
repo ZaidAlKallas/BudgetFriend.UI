@@ -1,0 +1,57 @@
+@inject LocalizationService Local
+
+<div class="error-state @(Error?.IsClientError == true ? "error-client" : Error?.IsServerError == true ? "error-server" : "")" role="alert">
+    <SvgIcon Name="info" Size="32" />
+
+    @if (Error?.StatusCode is { } status)
+    {
+        <span class="error-badge">@status</span>
+    }
+
+    <span class="error-title">@TitleText</span>
+
+    @if (DetailText is not null)
+    {
+        <span class="error-detail">@DetailText</span>
+    }
+
+    @if (Error?.FieldErrors.Count > 0)
+    {
+        <ul class="error-fields">
+            @foreach (var field in Error.FieldErrors)
+            {
+                <li>@field</li>
+            }
+        </ul>
+    }
+
+    @if (OnRetry.HasDelegate)
+    {
+        <button class="btn btn-ghost" @onclick="OnRetry">
+            <SvgIcon Name="refresh" Size="16" /> @Local["State.TryAgain"]
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    [Parameter]
+    public ApiErrorMessage? Error { get; set; }
+
+    private string TitleText {
+        get {
+            if (Error?.Title is { } key) {
+                return Local[key];
+            }
+
+            return string.IsNullOrWhiteSpace(Message) ? Local["State.Error"] : Message;
+        }
+    }
+
+    private string? DetailText => Error?.Detail;
+}

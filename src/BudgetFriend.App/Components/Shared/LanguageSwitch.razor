@@ -1,0 +1,29 @@
+@inject LocalizationService Local
+@implements IDisposable
+
+<div class="segmented" role="group" aria-label="@Local["Settings.Language"]">
+    @foreach (var language in Languages)
+    {
+        <button type="button"
+                class="@(Local.LanguageCode == language.Code ? "active" : "")"
+                @onclick="() => SetLanguageAsync(language.Code)">
+            <SvgIcon Name="globe" Size="16" /> @language.Label
+        </button>
+    }
+</div>
+
+@code {
+    private static readonly (string Code, string Label)[] Languages =
+    {
+        ("en", "English"),
+        ("ar", "العربية"),
+    };
+
+    private Task SetLanguageAsync(string code) => Local.SetLanguage(code);
+
+    protected override void OnInitialized() => Local.LanguageChanged += OnLanguageChanged;
+
+    private void OnLanguageChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Local.LanguageChanged -= OnLanguageChanged;
+}

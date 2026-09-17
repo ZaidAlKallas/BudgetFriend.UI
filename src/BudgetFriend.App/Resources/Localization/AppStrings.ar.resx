@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Navigation -->
+  <data name="Nav.Dashboard" xml:space="preserve"><value>لوحة التحكم</value></data>
+  <data name="Nav.Accounts" xml:space="preserve"><value>الحسابات</value></data>
+  <data name="Nav.Transactions" xml:space="preserve"><value>المعاملات</value></data>
+  <data name="Nav.Transfers" xml:space="preserve"><value>التحويلات</value></data>
+  <data name="Nav.Categories" xml:space="preserve"><value>الفئات</value></data>
+  <data name="Nav.Settings" xml:space="preserve"><value>الإعدادات</value></data>
+
+  <!-- Authentication -->
+  <data name="Auth.Login" xml:space="preserve"><value>تسجيل الدخول</value></data>
+  <data name="Auth.Register" xml:space="preserve"><value>إنشاء حساب</value></data>
+  <data name="Auth.Logout" xml:space="preserve"><value>تسجيل الخروج</value></data>
+  <data name="Auth.Email" xml:space="preserve"><value>البريد الإلكتروني</value></data>
+  <data name="Auth.Password" xml:space="preserve"><value>كلمة المرور</value></data>
+  <data name="Auth.ConfirmPassword" xml:space="preserve"><value>تأكيد كلمة المرور</value></data>
+  <data name="Auth.FirstName" xml:space="preserve"><value>الاسم الأول</value></data>
+  <data name="Auth.LastName" xml:space="preserve"><value>اسم العائلة</value></data>
+  <data name="Auth.ForgotPassword" xml:space="preserve"><value>نسيت كلمة المرور؟</value></data>
+  <data name="Auth.ResetPassword" xml:space="preserve"><value>إعادة تعيين كلمة المرور</value></data>
+  <data name="Auth.VerifyEmail" xml:space="preserve"><value>تحقق من البريد الإلكتروني</value></data>
+  <data name="Auth.ResendVerification" xml:space="preserve"><value>إعادة إرسال التحقق</value></data>
+  <data name="Auth.SignInWithGoogle" xml:space="preserve"><value>تسجيل الدخول بحساب Google</value></data>
+  <data name="Auth.Or" xml:space="preserve"><value>أو</value></data>
+  <data name="Auth.GoogleUnavailable" xml:space="preserve"><value>تسجيل الدخول بحساب Google غير مُفعّل بعد.</value></data>
+  <data name="Auth.NoAccount" xml:space="preserve"><value>ليس لديك حساب؟</value></data>
+  <data name="Auth.HasAccount" xml:space="preserve"><value>لديك حساب بالفعل؟</value></data>
+  <data name="Auth.LoginTitle" xml:space="preserve"><value>مرحبًا بعودتك</value></data>
+  <data name="Auth.RegisterTitle" xml:space="preserve"><value>إنشاء حسابك</value></data>
+
+  <!-- Actions -->
+  <data name="Action.Save" xml:space="preserve"><value>حفظ</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>إلغاء</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="Action.Edit" xml:space="preserve"><value>تعديل</value></data>
+  <data name="Action.Create" xml:space="preserve"><value>إنشاء</value></data>
+  <data name="Action.Add" xml:space="preserve"><value>إضافة</value></data>
+  <data name="Action.Search" xml:space="preserve"><value>بحث</value></data>
+  <data name="Action.Clear" xml:space="preserve"><value>مسح</value></data>
+  <data name="Action.Back" xml:space="preserve"><value>رجوع</value></data>
+  <data name="Action.Next" xml:space="preserve"><value>التالي</value></data>
+  <data name="Action.Previous" xml:space="preserve"><value>السابق</value></data>
+  <data name="Action.Confirm" xml:space="preserve"><value>تأكيد</value></data>
+  <data name="Action.OK" xml:space="preserve"><value>موافق</value></data>
+
+  <!-- States -->
+  <data name="State.Loading" xml:space="preserve"><value>جارٍ التحميل...</value></data>
+  <data name="State.Empty" xml:space="preserve"><value>لا توجد بيانات بعد.</value></data>
+  <data name="State.Error" xml:space="preserve"><value>حدث خطأ ما.</value></data>
+  <data name="State.TryAgain" xml:space="preserve"><value>حاول مرة أخرى</value></data>
+  <data name="State.NoAccounts" xml:space="preserve"><value>لا توجد حسابات بعد. أنشئ حسابك الأول للبدء.</value></data>
+  <data name="State.NoCategories" xml:space="preserve"><value>لا توجد فئات بعد.</value></data>
+  <data name="State.NoTransactions" xml:space="preserve"><value>لا توجد معاملات بعد.</value></data>
+  <data name="State.NoTransfers" xml:space="preserve"><value>لا توجد تحويلات بعد.</value></data>
+  <data name="State.NoResults" xml:space="preserve"><value>لم يتم العثور على نتائج.</value></data>
+  <data name="State.Now" xml:space="preserve"><value>الآن</value></data>
+
+  <!-- Dashboard -->
+  <data name="Dashboard.Overview" xml:space="preserve"><value>نظرة عامة</value></data>
+  <data name="Dashboard.TotalBalance" xml:space="preserve"><value>الرصيد الإجمالي</value></data>
+  <data name="Dashboard.MonthlyIncome" xml:space="preserve"><value>الدخل الشهري</value></data>
+  <data name="Dashboard.MonthlyExpenses" xml:space="preserve"><value>المصروفات الشهرية</value></data>
+  <data name="Dashboard.NetAmount" xml:space="preserve"><value>صافي المبلغ</value></data>
+  <data name="Dashboard.TopCategories" xml:space="preserve"><value>أعلى فئات المصروفات</value></data>
+  <data name="Dashboard.RecentTransactions" xml:space="preserve"><value>المعاملات الأخيرة</value></data>
+  <data name="Dashboard.Summary" xml:space="preserve"><value>ملخص مالي</value></data>
+  <data name="Dashboard.Period" xml:space="preserve"><value>الفترة</value></data>
+  <data name="Dashboard.FromDate" xml:space="preserve"><value>من</value></data>
+  <data name="Dashboard.ToDate" xml:space="preserve"><value>إلى</value></data>
+  <data name="Dashboard.CategoryBreakdown" xml:space="preserve"><value>تفاصيل الفئات</value></data>
+
+  <!-- Accounts -->
+  <data name="Account.Account" xml:space="preserve"><value>حساب</value></data>
+  <data name="Account.Name" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Account.InitialBalance" xml:space="preserve"><value>الرصيد الأولي</value></data>
+  <data name="Account.CurrentBalance" xml:space="preserve"><value>الرصيد الحالي</value></data>
+  <data name="Account.Currency" xml:space="preserve"><value>العملة</value></data>
+  <data name="Account.Create" xml:space="preserve"><value>إنشاء حساب</value></data>
+  <data name="Account.Edit" xml:space="preserve"><value>تعديل الحساب</value></data>
+  <data name="Account.Delete" xml:space="preserve"><value>حذف الحساب</value></data>
+  <data name="Account.Details" xml:space="preserve"><value>تفاصيل الحساب</value></data>
+  <data name="Account.Transactions" xml:space="preserve"><value>المعاملات</value></data>
+
+  <!-- Categories -->
+  <data name="Category.Category" xml:space="preserve"><value>فئة</value></data>
+  <data name="Category.Name" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Category.Create" xml:space="preserve"><value>إنشاء فئة</value></data>
+  <data name="Category.Edit" xml:space="preserve"><value>تعديل الفئة</value></data>
+  <data name="Category.Delete" xml:space="preserve"><value>حذف الفئة</value></data>
+  <data name="Category.TransactionType" xml:space="preserve"><value>نوع المعاملة</value></data>
+
+  <!-- Transaction Types -->
+  <data name="TxType.Income" xml:space="preserve"><value>دخل</value></data>
+  <data name="TxType.Expense" xml:space="preserve"><value>مصروف</value></data>
+  <data name="TxType.TransferIn" xml:space="preserve"><value>تحويل وارد</value></data>
+  <data name="TxType.TransferOut" xml:space="preserve"><value>تحويل صادر</value></data>
+
+  <!-- Transactions -->
+  <data name="Transaction.Transaction" xml:space="preserve"><value>معاملة</value></data>
+  <data name="Transaction.Create" xml:space="preserve"><value>إضافة معاملة</value></data>
+  <data name="Transaction.Edit" xml:space="preserve"><value>تعديل المعاملة</value></data>
+  <data name="Transaction.Delete" xml:space="preserve"><value>حذف المعاملة</value></data>
+  <data name="Transaction.Amount" xml:space="preserve"><value>المبلغ</value></data>
+  <data name="Transaction.Note" xml:space="preserve"><value>ملاحظة</value></data>
+  <data name="Transaction.Date" xml:space="preserve"><value>التاريخ</value></data>
+  <data name="Transaction.Account" xml:space="preserve"><value>الحساب</value></data>
+  <data name="Transaction.Category" xml:space="preserve"><value>الفئة</value></data>
+  <data name="Transaction.Filter" xml:space="preserve"><value>تصفية</value></data>
+  <data name="Transaction.SelectDate" xml:space="preserve"><value>اختر التاريخ</value></data>
+
+  <!-- Transfers -->
+  <data name="Transfer.Transfer" xml:space="preserve"><value>تحويل</value></data>
+  <data name="Transfer.Create" xml:space="preserve"><value>تحويل جديد</value></data>
+  <data name="Transfer.Delete" xml:space="preserve"><value>حذف التحويل</value></data>
+  <data name="Transfer.FromAccount" xml:space="preserve"><value>من حساب</value></data>
+  <data name="Transfer.ToAccount" xml:space="preserve"><value>إلى حساب</value></data>
+  <data name="Transfer.FromAmount" xml:space="preserve"><value>المبلغ المصدر</value></data>
+  <data name="Transfer.ToAmount" xml:space="preserve"><value>المبلغ المستهدف</value></data>
+  <data name="Transfer.Date" xml:space="preserve"><value>تاريخ التحويل</value></data>
+
+  <!-- Time -->
+  <data name="Time.AM" xml:space="preserve"><value>ص</value></data>
+  <data name="Time.PM" xml:space="preserve"><value>م</value></data>
+
+  <!-- Settings -->
+  <data name="Settings.Title" xml:space="preserve"><value>الإعدادات</value></data>
+  <data name="Settings.Language" xml:space="preserve"><value>اللغة</value></data>
+  <data name="Settings.Theme" xml:space="preserve"><value>المظهر</value></data>
+  <data name="Settings.ThemeLight" xml:space="preserve"><value>فاتح</value></data>
+  <data name="Settings.ThemeDark" xml:space="preserve"><value>داكن</value></data>
+  <data name="Settings.ThemeSystem" xml:space="preserve"><value>النظام</value></data>
+  <data name="Settings.Account" xml:space="preserve"><value>الحساب</value></data>
+  <data name="Settings.Logout" xml:space="preserve"><value>تسجيل الخروج</value></data>
+  <data name="Settings.Verified" xml:space="preserve"><value>موثق</value></data>
+  <data name="Settings.NotVerified" xml:space="preserve"><value>غير موثق</value></data>
+
+  <!-- Common -->
+  <data name="Common.Confirm" xml:space="preserve"><value>هل أنت متأكد؟</value></data>
+  <data name="Common.Success" xml:space="preserve"><value>نجاح</value></data>
+  <data name="Common.OperationCompleted" xml:space="preserve"><value>تمت العملية بنجاح.</value></data>
+
+  <!-- Validation -->
+  <data name="Validation.Required" xml:space="preserve"><value>هذا الحقل مطلوب.</value></data>
+  <data name="Validation.InvalidEmail" xml:space="preserve"><value>يرجى إدخال بريد إلكتروني صالح.</value></data>
+  <data name="Validation.PasswordMismatch" xml:space="preserve"><value>كلمتا المرور غير متطابقتين.</value></data>
+  <data name="Validation.PasswordTooShort" xml:space="preserve"><value>يجب أن تكون كلمة المرور 6 أحرف على الأقل.</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.Network" xml:space="preserve"><value>يتعذر الاتصال. يرجى التحقق من اتصالك بالإنترنت.</value></data>
+  <data name="Error.Server" xml:space="preserve"><value>حدث خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقًا.</value></data>
+  <data name="Error.Unexpected" xml:space="preserve"><value>حدث خطأ غير متوقع.</value></data>
+  <data name="Error.Unauthorized" xml:space="preserve"><value>انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.</value></data>
+  <data name="Error.Timeout" xml:space="preserve"><value>انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.</value></data>
+  <data name="Error.Http400" xml:space="preserve"><value>تعذرت معالجة طلبك.</value></data>
+  <data name="Error.Http401" xml:space="preserve"><value>يرجى تسجيل الدخول للمتابعة.</value></data>
+  <data name="Error.Http403" xml:space="preserve"><value>ليس لديك صلاحية للقيام بهذا الإجراء.</value></data>
+  <data name="Error.Http404" xml:space="preserve"><value>لم يعد هذا العنصر موجودًا.</value></data>
+  <data name="Error.Http405" xml:space="preserve"><value>هذا الإجراء غير مسموح به.</value></data>
+  <data name="Error.Http409" xml:space="preserve"><value>تم تغيير العنصر بواسطة شخص آخر. حاول مرة أخرى.</value></data>
+  <data name="Error.Http422" xml:space="preserve"><value>بعض المعلومات التي أدخلتها غير صالحة.</value></data>
+  <data name="Error.Http429" xml:space="preserve"><value>محاولات كثيرة جدًا. يرجى الانتظار والمحاولة مرة أخرى.</value></data>
+  <data name="Error.Http5xx" xml:space="preserve"><value>الخادم يواجه مشكلة. يرجى المحاولة مرة أخرى لاحقًا.</value></data>
+</root>

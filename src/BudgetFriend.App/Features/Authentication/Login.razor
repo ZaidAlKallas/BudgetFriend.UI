@@ -1,0 +1,144 @@
+@inherits LocalizedComponentBase
+@page "/login"
+@inject IAuthService Auth
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject ApiSettings Settings
+
+<div class="card auth-card">
+    <div class="brand-large">
+        <span class="logo">B</span>
+        <span>BudgetFriend</span>
+    </div>
+    <h2 class="page-title" style="margin-bottom: 20px;">@Local["Auth.LoginTitle"]</h2>
+
+    <EditForm Model="Model" OnValidSubmit="LoginAsync" FormName="login">
+        <DataAnnotationsValidator />
+        <div class="field">
+            <label for="login-email">@Local["Auth.Email"]</label>
+            <InputText id="login-email" @bind-Value="Model.Email" class="input" type="email" autocomplete="username" />
+            <ValidationMessage For="() => Model.Email" />
+        </div>
+        <div class="field">
+            <label for="login-password">@Local["Auth.Password"]</label>
+            <InputText id="login-password" @bind-Value="Model.Password" class="input" type="password" autocomplete="current-password" />
+            <ValidationMessage For="() => Model.Password" />
+        </div>
+
+        @if (_errorMessage is not null)
+        {
+            <div class="validation-message" role="alert">@_errorMessage</div>
+        }
+
+        <button class="btn btn-primary btn-block" disabled="@_busy">
+            @if (_busy)
+            {
+                <span class="spinner"></span>
+            }
+            @Local["Auth.Login"]
+        </button>
+    </EditForm>
+
+    <div class="form-divider"><span>@Local["Auth.Or"]</span></div>
+    <button class="btn btn-google btn-block" disabled="@_busy" @onclick="GoogleSignInAsync">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        @Local["Auth.SignInWithGoogle"]
+    </button>
+
+    <div class="form-note" style="text-align:center; margin-top:16px;">
+        @Local["Auth.NoAccount"]
+        <a href="/register">@Local["Auth.Register"]</a>
+    </div>
+    <div class="form-note" style="text-align:center; margin-top:6px;">
+        <a href="/forgot-password">@Local["Auth.ForgotPassword"]</a>
+    </div>
+</div>
+
+@code {
+    private LoginForm Model { get; } = new();
+    private bool _busy;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        if (Auth.IsAuthenticated)
+        {
+            Nav.NavigateTo("/", forceLoad: false);
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        _busy = true;
+        _errorMessage = null;
+        try
+        {
+            var result = await Auth.LoginAsync(Model.Email!.Trim(), Model.Password!);
+            if (result.IsSuccess)
+            {
+                Nav.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                _errorMessage = result.Error;
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task GoogleSignInAsync()
+    {
+        _busy = true;
+        _errorMessage = null;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(Settings.GoogleClientId))
+            {
+                _errorMessage = Local["Auth.GoogleUnavailable"];
+                return;
+            }
+
+            var credential = await JS.InvokeAsync<string>("bf.googleSignIn", Settings.GoogleClientId);
+            if (string.IsNullOrEmpty(credential))
+            {
+                return; // Flow dismissed by the user or the SDK failed to load.
+            }
+
+            var result = await Auth.LoginWithGoogleAsync(credential);
+            if (result.IsSuccess)
+            {
+                Nav.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                _errorMessage = result.Error;
+            }
+        }
+        catch (Exception ex) when (ex is JSException or HttpRequestException or TaskCanceledException)
+        {
+            _errorMessage = Local["Error.Network"];
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    public sealed class LoginForm
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        public string? Password { get; set; }
+    }
+}

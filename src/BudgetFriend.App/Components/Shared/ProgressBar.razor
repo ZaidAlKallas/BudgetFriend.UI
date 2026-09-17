@@ -1,0 +1,13 @@
+<div class="bar-track" role="presentation">
+    <div class="bar-fill" style="width: @Percent%"></div>
+</div>
+
+@code {
+    [Parameter]
+    public decimal Value { get; set; }
+
+    [Parameter]
+    public decimal Max { get; set; } = 100;
+
+    private decimal Percent => Max <= 0 ? 0 : Math.Clamp(Value / Max * 100, 0, 100);
+}
