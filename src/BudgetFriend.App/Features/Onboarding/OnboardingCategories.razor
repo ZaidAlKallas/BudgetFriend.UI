@@ -1,0 +1,237 @@
+@inherits LocalizedComponentBase
+@inject ICategoryService CategoriesService
+
+<div class="onboarding-panel">
+    <div class="onboarding-icon">
+        <SvgIcon Name="tag" Size="28" />
+    </div>
+    <h2 class="page-title">@Local["Onboarding.Categories.Title"]</h2>
+    <p class="form-note">@Local["Onboarding.Categories.Description"]</p>
+
+    @if (_categories is { Count: > 0 })
+    {
+        <div class="chip chip-income">@Local["Onboarding.Categories.Count", _categories.Count]</div>
+        <div class="onboarding-chip-list">
+            @foreach (var category in _categories)
+            {
+                <div class="chip">
+                    <SvgIcon Name="tag" Size="13" /> @category.Name
+                    <span class="muted">· @TypeName(category.TransactionType)</span>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="seed-section">
+        <h3 class="card-title">@Local["Onboarding.Seed.Title"]</h3>
+        <p class="form-note small">@Local["Onboarding.Categories.Seed.Description"]</p>
+        <div class="seed-chips">
+            @foreach (var suggestion in _categorySuggestions)
+            {
+                var isSelected = _drafts.Any(d => d.SourceKey == suggestion.Key);
+                <button type="button" class="seed-chip @(isSelected ? "selected" : "")" aria-pressed="@isSelected"
+                        @onclick="() => ToggleSuggestion(suggestion.Key)">
+                    <SvgIcon Name="tag" Size="14" /> @Local[suggestion.Key]
+                    <span class="seed-chip-type @(suggestion.Type == TransactionType.Income ? "income" : "expense")">@TypeName(suggestion.Type)</span>
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="form-divider"><span>@Local["Auth.Or"]</span></div>
+
+    <EditForm Model="_form" OnValidSubmit="AddToBasket" FormName="onboarding-category-form">
+        <DataAnnotationsValidator />
+        <div class="grid grid-2" style="gap:10px;">
+            <div class="field">
+                <label>@Local["Category.Name"]</label>
+                <InputText @bind-Value="_form.Name" class="input" autocomplete="off" />
+                <ValidationMessage For="() => _form.Name" />
+            </div>
+            <div class="field">
+                <label>@Local["Category.TransactionType"]</label>
+                <select class="input" @bind="_form.TransactionType">
+                    <option value="@TransactionType.Income">@Local["TxType.Income"]</option>
+                    <option value="@TransactionType.Expense">@Local["TxType.Expense"]</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-outline btn-block" type="submit">
+            <SvgIcon Name="plus" Size="15" /> @Local["Onboarding.Seed.AddToList"]
+        </button>
+    </EditForm>
+
+    @if (_drafts.Count > 0)
+    {
+        <div class="draft-section">
+            <h3 class="card-title">@Local["Onboarding.Seed.ReadyToAdd", _drafts.Count]</h3>
+            <div class="draft-list">
+                @foreach (var draft in _drafts)
+                {
+                    <div class="draft-row category">
+                        <input class="input" @bind="draft.Name" autocomplete="off" aria-label="@Local["Category.Name"]" />
+                        <select class="input" @bind="draft.TransactionType" aria-label="@Local["Category.TransactionType"]">
+                            <option value="@TransactionType.Income">@Local["TxType.Income"]</option>
+                            <option value="@TransactionType.Expense">@Local["TxType.Expense"]</option>
+                        </select>
+                        <button type="button" class="icon-btn" @onclick="() => RemoveDraft(draft)" title="@Local["Action.Remove"]">
+                            <SvgIcon Name="x" Size="16" />
+                        </button>
+                    </div>
+                }
+            </div>
+
+            @if (_error is not null)
+            {
+                <div class="validation-message" role="alert">@_error</div>
+            }
+
+            <button class="btn btn-primary btn-block" disabled="@(_busy || _drafts.Count == 0)" @onclick="CreateAllAsync">
+                @if (_busy)
+                {
+                    <span class="spinner"></span>
+                }
+                <SvgIcon Name="plus" Size="15" /> @Local["Onboarding.Seed.CreateAll", _drafts.Count]
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private static readonly (string Key, TransactionType Type)[] _categorySuggestions =
+    {
+        ("Onboarding.Seed.Category.Food", TransactionType.Expense),
+        ("Onboarding.Seed.Category.Utilities", TransactionType.Expense),
+        ("Onboarding.Seed.Category.Health", TransactionType.Expense),
+        ("Onboarding.Seed.Category.Entertainment", TransactionType.Expense),
+        ("Onboarding.Seed.Category.Transport", TransactionType.Expense),
+        ("Onboarding.Seed.Category.Shopping", TransactionType.Expense),
+        ("Onboarding.Seed.Category.Salary", TransactionType.Income),
+        ("Onboarding.Seed.Category.Bonus", TransactionType.Income),
+    };
+
+    private readonly CategoryFormModel _form = new();
+    private readonly List<CategoryDraft> _drafts = new();
+    private IReadOnlyList<CategoryDto>? _categories;
+    private string? _error;
+    private bool _busy;
+
+    [Parameter, EditorRequired]
+    public OnboardingState State { get; set; } = new(false, false, false, false, false);
+
+    [Parameter]
+    public EventCallback OnCategoriesCreated { get; set; }
+
+    protected override async Task OnInitializedAsync() => await LoadCategoriesAsync();
+
+    private async Task LoadCategoriesAsync()
+    {
+        try
+        {
+            _categories = await CategoriesService.GetCategoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = BuildError(ex);
+        }
+    }
+
+    private void ToggleSuggestion(string key)
+    {
+        var existing = _drafts.FirstOrDefault(d => d.SourceKey == key);
+        if (existing is not null)
+        {
+            _drafts.Remove(existing);
+            return;
+        }
+
+        var type = _categorySuggestions.First(s => s.Key == key).Type;
+        _drafts.Add(new CategoryDraft
+        {
+            SourceKey = key,
+            Name = Local[key],
+            TransactionType = type
+        });
+    }
+
+    private void AddToBasket()
+    {
+        if (string.IsNullOrWhiteSpace(_form.Name))
+        {
+            return;
+        }
+
+        _drafts.Add(new CategoryDraft
+        {
+            SourceKey = null,
+            Name = _form.Name!.Trim(),
+            TransactionType = _form.TransactionType ?? BudgetFriend.App.Models.TransactionType.Expense
+        });
+        _form.Name = "";
+    }
+
+    private void RemoveDraft(CategoryDraft draft) => _drafts.Remove(draft);
+
+    private async Task CreateAllAsync()
+    {
+        if (_busy || _drafts.Count == 0) return;
+        if (_drafts.Any(d => string.IsNullOrWhiteSpace(d.Name)))
+        {
+            _error = Local["Onboarding.Seed.NameRequired"];
+            return;
+        }
+
+        _busy = true;
+        _error = null;
+        try
+        {
+            foreach (var draft in _drafts.ToArray())
+            {
+                await CategoriesService.CreateCategoryAsync(new CreateCategoryRequest(draft.Name.Trim(), draft.TransactionType));
+            }
+            _drafts.Clear();
+            await LoadCategoriesAsync();
+            await OnCategoriesCreated.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = BuildError(ex);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private string TypeName(TransactionType? type) => type switch
+    {
+        TransactionType.Income => Local["TxType.Income"],
+        TransactionType.Expense => Local["TxType.Expense"],
+        _ => "—"
+    };
+
+    private string? BuildError(Exception ex)
+    {
+        var error = ApiErrorMessage.From(ex);
+        if (error.FieldErrors.Count > 0)
+            return string.Join(", ", error.FieldErrors);
+        if (!string.IsNullOrWhiteSpace(error.Detail))
+            return error.Detail;
+        return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class CategoryFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string? Name { get; set; }
+
+        public TransactionType? TransactionType { get; set; } = BudgetFriend.App.Models.TransactionType.Expense;
+    }
+
+    public sealed class CategoryDraft
+    {
+        public string? SourceKey { get; set; }
+        public string Name { get; set; } = "";
+        public TransactionType TransactionType { get; set; } = BudgetFriend.App.Models.TransactionType.Expense;
+    }
+}

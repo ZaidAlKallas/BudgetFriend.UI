@@ -81,7 +81,8 @@
             var result = await Auth.LoginAsync(Model.Email!.Trim(), Model.Password!);
             if (result.IsSuccess)
             {
-                Nav.NavigateTo("/", forceLoad: true);
+                var profile = await Auth.RefreshProfileAsync();
+                Nav.NavigateTo(profile?.IsEmailVerified == true ? "/" : "/onboarding", forceLoad: true);
             }
             else
             {

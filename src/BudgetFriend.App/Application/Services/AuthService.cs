@@ -157,6 +157,9 @@ public sealed class AuthService : AuthenticationStateProvider, IAuthService {
     public Task VerifyEmailAsync(string token, CancellationToken ct = default)
         => _authApi.VerifyEmailAsync(new VerifyEmailRequest(token), ct);
 
+    public Task ResendVerificationAsync(string email, CancellationToken ct = default)
+        => _authApi.ResendVerificationAsync(new ResendVerificationRequest(email), ct);
+
     // ---- Profile ------------------------------------------------------------
 
     public async Task<UserProfile?> GetProfileAsync(CancellationToken ct = default) {
@@ -169,6 +172,15 @@ public sealed class AuthService : AuthenticationStateProvider, IAuthService {
         catch {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Clears the cached profile and refetches it from the API, so callers get
+    /// up-to-date data (e.g. right after a successful email verification).
+    /// </summary>
+    public async Task<UserProfile?> RefreshProfileAsync(CancellationToken ct = default) {
+        _profile = null;
+        return await GetProfileAsync(ct).ConfigureAwait(false);
     }
 
     // ---- Internal -----------------------------------------------------------

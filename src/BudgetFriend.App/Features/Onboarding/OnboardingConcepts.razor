@@ -1,0 +1,131 @@
+@inherits LocalizedComponentBase
+@inject OnboardingService OnboardingSvc
+
+<div class="onboarding-panel">
+    <div class="onboarding-icon">
+        <SvgIcon Name="list" Size="28" />
+    </div>
+    <h2 class="page-title">@Local["Onboarding.Concepts.Title"]</h2>
+    <p class="form-note">@Local["Onboarding.Concepts.Description"]</p>
+
+    <div class="grid grid-2">
+        <div class="card concept-card">
+            <div class="concept-icon"><SvgIcon Name="list" Size="22" /></div>
+            <h3 class="card-title">@Local["Onboarding.Concepts.Transactions.Title"]</h3>
+            <p class="form-note">@Local["Onboarding.Concepts.Transactions.Body"]</p>
+            <div class="chip chip-income"><SvgIcon Name="arrow-right" Size="12" /> @Local["TxType.Income"]</div>
+            <div class="chip chip-expense"><SvgIcon Name="arrow-right" Size="12" /> @Local["TxType.Expense"]</div>
+        </div>
+        <div class="card concept-card">
+            <div class="concept-icon"><SvgIcon Name="transfer" Size="22" /></div>
+            <h3 class="card-title">@Local["Onboarding.Concepts.Transfers.Title"]</h3>
+            <p class="form-note">@Local["Onboarding.Concepts.Transfers.Body"]</p>
+            <div class="chip chip-transfer"><SvgIcon Name="transfer" Size="12" /> @Local["Onboarding.Concepts.Transfers.Tag"]</div>
+        </div>
+    </div>
+
+    @if (_complete)
+    {
+        <div class="quiz-result">
+            <SvgIcon Name="check" Size="18" /> @Local["Onboarding.Concepts.Quiz.Success"]
+        </div>
+    }
+    else
+    {
+        <div class="card quiz-card">
+            <h3 class="card-title">@Local["Onboarding.Concepts.Quiz.Title"]</h3>
+
+            <div class="field">
+                <label>@Local["Onboarding.Concepts.Quiz.Q1"]</label>
+                <div class="quiz-options">
+                    @foreach (var option in _quizOptions)
+                    {
+                        <button type="button" class="btn @(_q1Answer == option ? "btn-primary" : "btn-outline")"
+                                @onclick="() => AnswerQ1(option)">
+                            @Local[option]
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="field">
+                <label>@Local["Onboarding.Concepts.Quiz.Q2"]</label>
+                <div class="quiz-options">
+                    @foreach (var option in _quizOptions)
+                    {
+                        <button type="button" class="btn @(_q2Answer == option ? "btn-primary" : "btn-outline")"
+                                @onclick="() => AnswerQ2(option)">
+                            @Local[option]
+                        </button>
+                    }
+                </div>
+            </div>
+
+            @if (_error is not null)
+            {
+                <div class="validation-message" role="alert">@_error</div>
+            }
+
+            <button class="btn btn-primary btn-block" disabled="@(!_answersAllChosen || _busy)" @onclick="CompleteAsync">
+                @if (_busy)
+                {
+                    <span class="spinner"></span>
+                }
+                @Local["Onboarding.Concepts.Quiz.Finish"]
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private static readonly string[] _quizOptions = { "TxType.Income", "TxType.Expense", "TxType.TransferIn" };
+
+    private string? _q1Answer;
+    private string? _q2Answer;
+    private bool _busy;
+    private bool _complete;
+    private string? _error;
+
+    [Parameter, EditorRequired]
+    public OnboardingState State { get; set; } = new(false, false, false, false, false);
+
+    [Parameter]
+    public EventCallback OnConceptsCompleted { get; set; }
+
+    private bool _answersAllChosen => _q1Answer is not null && _q2Answer is not null;
+
+    private void AnswerQ1(string option) => _q1Answer = option;
+
+    private void AnswerQ2(string option) => _q2Answer = option;
+
+    private async Task CompleteAsync()
+    {
+        // Q1: paying for groceries is an Expense. Q2: moving money between your
+        // own accounts is a Transfer.
+        var correct = _q1Answer == "TxType.Expense" && _q2Answer == "TxType.TransferIn";
+        if (!correct)
+        {
+            _error = Local["Onboarding.Concepts.Quiz.Wrong"];
+            _q1Answer = null;
+            _q2Answer = null;
+            return;
+        }
+
+        _busy = true;
+        _error = null;
+        try
+        {
+            await OnboardingSvc.MarkTransactionsCompletedAsync();
+            _complete = true;
+            await OnConceptsCompleted.InvokeAsync();
+        }
+        catch
+        {
+            _error = Local["Error.Unexpected"];
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

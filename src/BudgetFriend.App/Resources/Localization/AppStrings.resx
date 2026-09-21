@@ -96,6 +96,7 @@
   <data name="Action.Clear" xml:space="preserve"><value>Clear</value></data>
   <data name="Action.Back" xml:space="preserve"><value>Back</value></data>
   <data name="Action.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Action.Remove" xml:space="preserve"><value>Remove</value></data>
   <data name="Action.Previous" xml:space="preserve"><value>Previous</value></data>
   <data name="Action.Confirm" xml:space="preserve"><value>Confirm</value></data>
   <data name="Action.OK" xml:space="preserve"><value>OK</value></data>
@@ -217,4 +218,70 @@
   <data name="Error.Http422" xml:space="preserve"><value>Some of the information you entered is not valid.</value></data>
   <data name="Error.Http429" xml:space="preserve"><value>Too many attempts. Please wait and try again.</value></data>
   <data name="Error.Http5xx" xml:space="preserve"><value>The server is having trouble. Please try again later.</value></data>
+
+  <!-- Onboarding -->
+  <data name="Onboarding.Title" xml:space="preserve"><value>Welcome</value></data>
+  <data name="Onboarding.Subtitle" xml:space="preserve"><value>Let's get you set up. A few quick steps and you'll be tracking your money.</value></data>
+  <data name="Onboarding.Step.Progress" xml:space="preserve"><value>Step {0} of {1}</value></data>
+  <data name="Onboarding.Step.Accounts" xml:space="preserve"><value>Accounts</value></data>
+  <data name="Onboarding.Step.Categories" xml:space="preserve"><value>Categories</value></data>
+  <data name="Onboarding.Step.Concepts" xml:space="preserve"><value>Concepts</value></data>
+  <data name="Onboarding.Step.VerifyEmail" xml:space="preserve"><value>Verify email</value></data>
+  <data name="Onboarding.Progress.Percent" xml:space="preserve"><value>{0}%</value></data>
+  <data name="Onboarding.Seed.Title" xml:space="preserve"><value>Start from suggestions</value></data>
+  <data name="Onboarding.Seed.AddToList" xml:space="preserve"><value>Add to list</value></data>
+  <data name="Onboarding.Seed.ReadyToAdd" xml:space="preserve"><value>{0} ready to add</value></data>
+  <data name="Onboarding.Seed.CreateAll" xml:space="preserve"><value>Create all ({0})</value></data>
+  <data name="Onboarding.Seed.NameRequired" xml:space="preserve"><value>Give every item a name.</value></data>
+  <data name="Onboarding.Accounts.Title" xml:space="preserve"><value>Create your first account</value></data>
+  <data name="Onboarding.Accounts.Description" xml:space="preserve"><value>An account holds money — your wallet, a bank card, or a savings fund. Start with the accounts you use the most.</value></data>
+  <data name="Onboarding.Accounts.Count" xml:space="preserve"><value>{0} account(s) ready</value></data>
+  <data name="Onboarding.Accounts.Seed.Description" xml:space="preserve"><value>Pick a few ready-made accounts to start with — or create your own below.</value></data>
+  <data name="Onboarding.Seed.Account.Checking" xml:space="preserve"><value>Checking account</value></data>
+  <data name="Onboarding.Seed.Account.Savings" xml:space="preserve"><value>Savings</value></data>
+  <data name="Onboarding.Seed.Account.Wallet" xml:space="preserve"><value>Wallet (cash)</value></data>
+  <data name="Onboarding.Seed.Account.Debit" xml:space="preserve"><value>Debit card</value></data>
+  <data name="Onboarding.Seed.Account.Credit" xml:space="preserve"><value>Credit card</value></data>
+  <data name="Onboarding.Categories.Title" xml:space="preserve"><value>Add your first category</value></data>
+  <data name="Onboarding.Categories.Description" xml:space="preserve"><value>Categories organize your income and expenses so you can see where your money goes. Start with a couple you care about.</value></data>
+  <data name="Onboarding.Categories.Count" xml:space="preserve"><value>{0} category(s) ready</value></data>
+  <data name="Onboarding.Categories.Seed.Description" xml:space="preserve"><value>Pick a few ready-made categories to start with — or create your own below.</value></data>
+  <data name="Onboarding.Seed.Category.Food" xml:space="preserve"><value>Food</value></data>
+  <data name="Onboarding.Seed.Category.Utilities" xml:space="preserve"><value>Utilities</value></data>
+  <data name="Onboarding.Seed.Category.Health" xml:space="preserve"><value>Health</value></data>
+  <data name="Onboarding.Seed.Category.Entertainment" xml:space="preserve"><value>Entertainment</value></data>
+  <data name="Onboarding.Seed.Category.Transport" xml:space="preserve"><value>Transport</value></data>
+  <data name="Onboarding.Seed.Category.Shopping" xml:space="preserve"><value>Shopping</value></data>
+  <data name="Onboarding.Seed.Category.Salary" xml:space="preserve"><value>Salary</value></data>
+  <data name="Onboarding.Seed.Category.Bonus" xml:space="preserve"><value>Bonus</value></data>
+  <data name="Onboarding.Concepts.Title" xml:space="preserve"><value>Transactions &amp; transfers</value></data>
+  <data name="Onboarding.Concepts.Description" xml:space="preserve"><value>Two ideas power BudgetFriend. Take a minute to get familiar before you start.</value></data>
+  <data name="Onboarding.Concepts.Transactions.Title" xml:space="preserve"><value>Transactions</value></data>
+  <data name="Onboarding.Concepts.Transactions.Body" xml:space="preserve"><value>Recording money in and out. Earn it? Income. Spend it? Expense. Every transaction belongs to an account and, optionally, a category.</value></data>
+  <data name="Onboarding.Concepts.Transfers.Title" xml:space="preserve"><value>Transfers</value></data>
+  <data name="Onboarding.Concepts.Transfers.Body" xml:space="preserve"><value>Moving money between your own accounts — for example from a bank card to your wallet. A transfer never changes your total balance.</value></data>
+  <data name="Onboarding.Concepts.Transfers.Tag" xml:space="preserve"><value>Between my own accounts</value></data>
+  <data name="Onboarding.Concepts.Quiz.Title" xml:space="preserve"><value>Quick check</value></data>
+  <data name="Onboarding.Concepts.Quiz.Q1" xml:space="preserve"><value>Paying for groceries is recorded as a …</value></data>
+  <data name="Onboarding.Concepts.Quiz.Q2" xml:space="preserve"><value>Moving money between two accounts you own is recorded as a …</value></data>
+  <data name="Onboarding.Concepts.Quiz.Finish" xml:space="preserve"><value>Check my answers</value></data>
+  <data name="Onboarding.Concepts.Quiz.Success" xml:space="preserve"><value>Got it — you're ready to start tracking!</value></data>
+  <data name="Onboarding.Concepts.Quiz.Wrong" xml:space="preserve"><value>Not quite — check the cards above and try again.</value></data>
+  <data name="Onboarding.Done.Title" xml:space="preserve"><value>You're all set!</value></data>
+  <data name="Onboarding.Done.Description" xml:space="preserve"><value>Your workspace is ready. Head to the dashboard to see your numbers.</value></data>
+  <data name="Onboarding.Done.GoToDashboard" xml:space="preserve"><value>Go to dashboard</value></data>
+
+  <!-- Email verification -->
+  <data name="Verify.Title" xml:space="preserve"><value>Verify your email</value></data>
+  <data name="Verify.Description" xml:space="preserve"><value>We sent a verification link to {0}. Click it to confirm your email — it expires in 24 hours.</value></data>
+  <data name="Verify.Sent" xml:space="preserve"><value>A new verification link is on its way.</value></data>
+  <data name="Verify.Invalid.Title" xml:space="preserve"><value>This link didn't work</value></data>
+  <data name="Verify.ContinueToLogin" xml:space="preserve"><value>Continue to login</value></data>
+  <data name="Verify.ResendForm.Title" xml:space="preserve"><value>Request a new link</value></data>
+  <data name="Verify.ResendForm.Description" xml:space="preserve"><value>Enter your email and we'll send you a fresh verification link.</value></data>
+  <data name="Verify.Already.Title" xml:space="preserve"><value>Already verified</value></data>
+  <data name="Verify.Already.Description" xml:space="preserve"><value>Your email is verified. There's nothing left to do here.</value></data>
+  <data name="Verify.Welcome.Title" xml:space="preserve"><value>Welcome to BudgetFriend!</value></data>
+  <data name="Verify.Welcome.Description" xml:space="preserve"><value>You're all set. Add a couple of income and expense entries today, and watch how small habits grow into real savings.</value></data>
+  <data name="Verify.Welcome.CtaStart" xml:space="preserve"><value>Start budgeting</value></data>
 </root>

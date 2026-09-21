@@ -96,6 +96,7 @@
   <data name="Action.Clear" xml:space="preserve"><value>مسح</value></data>
   <data name="Action.Back" xml:space="preserve"><value>رجوع</value></data>
   <data name="Action.Next" xml:space="preserve"><value>التالي</value></data>
+  <data name="Action.Remove" xml:space="preserve"><value>إزالة</value></data>
   <data name="Action.Previous" xml:space="preserve"><value>السابق</value></data>
   <data name="Action.Confirm" xml:space="preserve"><value>تأكيد</value></data>
   <data name="Action.OK" xml:space="preserve"><value>موافق</value></data>
@@ -217,4 +218,70 @@
   <data name="Error.Http422" xml:space="preserve"><value>بعض المعلومات التي أدخلتها غير صالحة.</value></data>
   <data name="Error.Http429" xml:space="preserve"><value>محاولات كثيرة جدًا. يرجى الانتظار والمحاولة مرة أخرى.</value></data>
   <data name="Error.Http5xx" xml:space="preserve"><value>الخادم يواجه مشكلة. يرجى المحاولة مرة أخرى لاحقًا.</value></data>
+
+  <!-- Onboarding -->
+  <data name="Onboarding.Title" xml:space="preserve"><value>مرحبًا</value></data>
+  <data name="Onboarding.Subtitle" xml:space="preserve"><value>دعنا نجهّز حسابك. بضع خطوات سريعة وستبدأ في تتبع أموالك.</value></data>
+  <data name="Onboarding.Step.Progress" xml:space="preserve"><value>الخطوة {0} من {1}</value></data>
+  <data name="Onboarding.Step.Accounts" xml:space="preserve"><value>الحسابات</value></data>
+  <data name="Onboarding.Step.Categories" xml:space="preserve"><value>الفئات</value></data>
+  <data name="Onboarding.Step.Concepts" xml:space="preserve"><value>المفاهيم</value></data>
+  <data name="Onboarding.Step.VerifyEmail" xml:space="preserve"><value>تحقق من البريد الإلكتروني</value></data>
+  <data name="Onboarding.Progress.Percent" xml:space="preserve"><value>{0}%</value></data>
+  <data name="Onboarding.Seed.Title" xml:space="preserve"><value>ابدأ من الاقتراحات</value></data>
+  <data name="Onboarding.Seed.AddToList" xml:space="preserve"><value>أضف إلى القائمة</value></data>
+  <data name="Onboarding.Seed.ReadyToAdd" xml:space="preserve"><value>{0} جاهزة للإضافة</value></data>
+  <data name="Onboarding.Seed.CreateAll" xml:space="preserve"><value>إنشاء الكل ({0})</value></data>
+  <data name="Onboarding.Seed.NameRequired" xml:space="preserve"><value>أعطِ اسمًا لكل عنصر.</value></data>
+  <data name="Onboarding.Accounts.Title" xml:space="preserve"><value>أنشئ حسابك الأول</value></data>
+  <data name="Onboarding.Accounts.Description" xml:space="preserve"><value>الحساب يحفظ أموالك — محفظتك أو بطاقتك البنكية أو صندوق ادخارك. ابدأ بالحسابات التي تستخدمها أكثر.</value></data>
+  <data name="Onboarding.Accounts.Count" xml:space="preserve"><value>{0} حسابًا جاهزًا</value></data>
+  <data name="Onboarding.Accounts.Seed.Description" xml:space="preserve"><value>اختر بعض الحسابات الجاهزة للبدء — أو أنشئ حسابك الخاص أدناه.</value></data>
+  <data name="Onboarding.Seed.Account.Checking" xml:space="preserve"><value>حساب جارٍ</value></data>
+  <data name="Onboarding.Seed.Account.Savings" xml:space="preserve"><value>حساب توفير</value></data>
+  <data name="Onboarding.Seed.Account.Wallet" xml:space="preserve"><value>محفظة (نقدي)</value></data>
+  <data name="Onboarding.Seed.Account.Debit" xml:space="preserve"><value>بطاقة خصم</value></data>
+  <data name="Onboarding.Seed.Account.Credit" xml:space="preserve"><value>بطاقة ائتمان</value></data>
+  <data name="Onboarding.Categories.Title" xml:space="preserve"><value>أضف فئتك الأولى</value></data>
+  <data name="Onboarding.Categories.Description" xml:space="preserve"><value>الفئات تُنظّم دخلك ومصروفاتك لترى أين تذهب أموالك. ابدأ بفئة أو اثنتين تهمّانك.</value></data>
+  <data name="Onboarding.Categories.Count" xml:space="preserve"><value>{0} فئة جاهزة</value></data>
+  <data name="Onboarding.Categories.Seed.Description" xml:space="preserve"><value>اختر بعض الفئات الجاهزة للبدء — أو أنشئ فئتك الخاصة أدناه.</value></data>
+  <data name="Onboarding.Seed.Category.Food" xml:space="preserve"><value>الطعام</value></data>
+  <data name="Onboarding.Seed.Category.Utilities" xml:space="preserve"><value>المرافق</value></data>
+  <data name="Onboarding.Seed.Category.Health" xml:space="preserve"><value>الصحة</value></data>
+  <data name="Onboarding.Seed.Category.Entertainment" xml:space="preserve"><value>الترفيه</value></data>
+  <data name="Onboarding.Seed.Category.Transport" xml:space="preserve"><value>النقل</value></data>
+  <data name="Onboarding.Seed.Category.Shopping" xml:space="preserve"><value>التسوق</value></data>
+  <data name="Onboarding.Seed.Category.Salary" xml:space="preserve"><value>الراتب</value></data>
+  <data name="Onboarding.Seed.Category.Bonus" xml:space="preserve"><value>المكافأة</value></data>
+  <data name="Onboarding.Concepts.Title" xml:space="preserve"><value>المعاملات والتحويلات</value></data>
+  <data name="Onboarding.Concepts.Description" xml:space="preserve"><value>فكرتان أساسيتان في BudgetFriend. خذ دقيقة لتتعرف عليهما قبل أن تبدأ.</value></data>
+  <data name="Onboarding.Concepts.Transactions.Title" xml:space="preserve"><value>المعاملات</value></data>
+  <data name="Onboarding.Concepts.Transactions.Body" xml:space="preserve"><value>تسجيل الأموال الواردة والصادرة. ربحت مالًا؟ دخل. أنفقت؟ مصروف. كل معاملة تخص حسابًا ويمكن ربطها بفئة.</value></data>
+  <data name="Onboarding.Concepts.Transfers.Title" xml:space="preserve"><value>التحويلات</value></data>
+  <data name="Onboarding.Concepts.Transfers.Body" xml:space="preserve"><value>نقل الأموال بين حساباتك الخاصة — مثل نقل المال من بطاقتك البنكية إلى محفظتك. التحويل لا يغيّر رصيدك الإجمالي.</value></data>
+  <data name="Onboarding.Concepts.Transfers.Tag" xml:space="preserve"><value>بين حساباتي الخاصة</value></data>
+  <data name="Onboarding.Concepts.Quiz.Title" xml:space="preserve"><value>اختبار سريع</value></data>
+  <data name="Onboarding.Concepts.Quiz.Q1" xml:space="preserve"><value>الدفع مقابل البقالة يُسجَّل كـ…</value></data>
+  <data name="Onboarding.Concepts.Quiz.Q2" xml:space="preserve"><value>نقل الأموال بين حسابين تملكهما يُسجَّل كـ…</value></data>
+  <data name="Onboarding.Concepts.Quiz.Finish" xml:space="preserve"><value>تحقق من إجاباتي</value></data>
+  <data name="Onboarding.Concepts.Quiz.Success" xml:space="preserve"><value>أحسنت — أنت مستعد للبدء في التتبع!</value></data>
+  <data name="Onboarding.Concepts.Quiz.Wrong" xml:space="preserve"><value>ليس تمامًا — راجع البطاقات أعلاه وحاول مجددًا.</value></data>
+  <data name="Onboarding.Done.Title" xml:space="preserve"><value>كل شيء جاهز!</value></data>
+  <data name="Onboarding.Done.Description" xml:space="preserve"><value>مساحة عملك جاهزة. انتقل إلى لوحة التحكم لترى أرقامك.</value></data>
+  <data name="Onboarding.Done.GoToDashboard" xml:space="preserve"><value>الانتقال إلى لوحة التحكم</value></data>
+
+  <!-- Email verification -->
+  <data name="Verify.Title" xml:space="preserve"><value>تحقق من بريدك الإلكتروني</value></data>
+  <data name="Verify.Description" xml:space="preserve"><value>أرسلنا رابط التحقق إلى {0}. اضغط عليه لتأكيد بريدك الإلكتروني — الرابط صالح لمدة 24 ساعة.</value></data>
+  <data name="Verify.Sent" xml:space="preserve"><value>تم إرسال رابط تحقق جديد.</value></data>
+  <data name="Verify.Invalid.Title" xml:space="preserve"><value>لم يعمل هذا الرابط</value></data>
+  <data name="Verify.ContinueToLogin" xml:space="preserve"><value>متابعة إلى تسجيل الدخول</value></data>
+  <data name="Verify.ResendForm.Title" xml:space="preserve"><value>اطلب رابطًا جديدًا</value></data>
+  <data name="Verify.ResendForm.Description" xml:space="preserve"><value>أدخل بريدك الإلكتروني وسنرسل لك رابط تحقق جديدًا.</value></data>
+  <data name="Verify.Already.Title" xml:space="preserve"><value>تم التحقق مسبقًا</value></data>
+  <data name="Verify.Already.Description" xml:space="preserve"><value>بريدك الإلكتروني موثّق. لا يوجد ما يجب فعله هنا.</value></data>
+  <data name="Verify.Welcome.Title" xml:space="preserve"><value>أهلًا بك في BudgetFriend!</value></data>
+  <data name="Verify.Welcome.Description" xml:space="preserve"><value>كل شيء جاهز. أضف بعض مداخيلك ومصروفاتك اليوم، وشاهد كيف تتحول العادات الصغيرة إلى مدخرات حقيقية.</value></data>
+  <data name="Verify.Welcome.CtaStart" xml:space="preserve"><value>ابدأ إدارة ميزانيتك</value></data>
 </root>

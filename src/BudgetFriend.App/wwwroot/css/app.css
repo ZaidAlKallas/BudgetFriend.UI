@@ -1213,6 +1213,320 @@ table.data tbody tr:hover {
   transition: width 0.3s ease;
 }
 
+/* ==========================================================================
+   Onboarding + email verification
+   ========================================================================== */
+
+.setup-shell {
+  place-items: start center;
+}
+
+.onboarding {
+  width: 100%;
+  max-width: 560px;
+}
+
+.onboarding-card {
+  padding: 28px;
+}
+
+.onboarding-progress {
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--bf-border);
+}
+
+.onboarding-progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.onboarding-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.onboarding-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 2px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--bf-radius-sm);
+  color: var(--bf-text-3);
+}
+
+.onboarding-step:hover:not(:disabled) {
+  background: var(--bf-surface-2);
+}
+
+.onboarding-step:disabled {
+  cursor: default;
+}
+
+.onboarding-step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bf-surface-3);
+  color: var(--bf-text-3);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.onboarding-step.active .onboarding-step-dot {
+  background: var(--bf-primary);
+  color: #fff;
+}
+
+.onboarding-step.done .onboarding-step-dot {
+  background: var(--bf-success);
+  color: #fff;
+}
+
+.onboarding-step-label {
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.onboarding-body {
+  padding-top: 22px;
+}
+
+.onboarding-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 22px;
+  margin-top: 22px;
+  border-top: 1px solid var(--bf-border);
+}
+
+.onboarding-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bf-primary-50);
+  color: var(--bf-primary);
+  margin-bottom: 12px;
+}
+
+.verify-welcome .welcome-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--bf-primary-50), var(--bf-primary));
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.28);
+}
+
+.onboarding-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.seed-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.seed-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.seed-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--bf-border);
+  background: var(--bf-surface-2);
+  color: var(--bf-text-2);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.seed-chip:hover {
+  border-color: var(--bf-primary);
+  color: var(--bf-text);
+}
+
+.seed-chip.selected {
+  background: var(--bf-primary-50);
+  border-color: var(--bf-primary);
+  color: var(--bf-primary);
+  font-weight: 600;
+}
+
+.seed-chip-type {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.seed-chip-type.income {
+  background: rgba(22, 163, 74, 0.14);
+  color: var(--bf-success);
+}
+
+.seed-chip-type.expense {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--bf-danger);
+}
+
+.draft-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--bf-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.draft-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.draft-row.account {
+  display: grid;
+  grid-template-columns: 1fr 130px 120px 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.draft-row.category {
+  display: grid;
+  grid-template-columns: 1fr 160px 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 520px) {
+  .draft-row.account,
+  .draft-row.category {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--bf-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--bf-text-2);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--bf-danger);
+  border-color: var(--bf-danger);
+}
+
+.concept-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.concept-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--bf-primary-50);
+  color: var(--bf-primary);
+  margin-bottom: 4px;
+}
+
+.quiz-card {
+  margin-top: 18px;
+}
+
+.quiz-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quiz-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: var(--bf-radius-sm);
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--bf-success);
+  font-weight: 600;
+}
+
+.form-success {
+  padding: 10px 12px;
+  border-radius: var(--bf-radius-xs);
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--bf-success);
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.verify-code-input {
+  letter-spacing: 0.35em;
+  font-size: 1.15rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.verify-resend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  min-height: 40px;
+}
+
+.onboarding-done {
+  padding: 28px;
+}
+
+/* RTL: mirror directional arrows inside the setup flow (back/next chevrons
+   and the income/expense arrows on the concept cards). */
+[dir="rtl"] .onboarding-footer .btn svg,
+[dir="rtl"] .concept-card .chip svg {
+  transform: scaleX(-1);
+}
+
 /* Scrollbars */
 ::-webkit-scrollbar {
   width: 10px;

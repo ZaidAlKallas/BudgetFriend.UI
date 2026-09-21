@@ -39,6 +39,7 @@ builder.Services.AddSingleton<IConnectivityService, WebConnectivityService>();
 builder.Services.AddScoped<LocalizationService>();
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<FinanceFormatter>();
+builder.Services.AddScoped<OnboardingService>();
 
 // Typed remote API services.
 builder.Services.AddScoped<IAuthApi, AuthApi>();

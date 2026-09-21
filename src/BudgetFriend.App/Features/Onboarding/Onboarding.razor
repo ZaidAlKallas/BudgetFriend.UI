@@ -1,0 +1,187 @@
+@inherits LocalizedComponentBase
+@page "/onboarding"
+@attribute [Authorize]
+@inject OnboardingService OnboardingSvc
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<div class="onboarding">
+    <div class="brand-large" style="justify-content:flex-start; margin-bottom:10px;">
+        <span class="logo">B</span>
+        <span>BudgetFriend</span>
+    </div>
+    <h2 class="page-title">@Local["Onboarding.Title"]</h2>
+    <p class="form-note" style="margin-bottom:20px;">@Local["Onboarding.Subtitle"]</p>
+
+    @if (_loading)
+    {
+        <LoadingIndicator />
+    }
+    else if (_state is null)
+    {
+        <ErrorState Error="_error" OnRetry="LoadAsync" />
+    }
+    else if (_state.IsComplete)
+    {
+        <div class="card auth-card onboarding-done">
+            <div class="onboarding-icon" style="margin:0 auto 14px;">
+                <SvgIcon Name="check" Size="28" />
+            </div>
+            <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Onboarding.Done.Title"]</h2>
+            <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Onboarding.Done.Description"]</p>
+            <div style="margin-bottom:20px;"><ProgressBar Value="100" Max="100" /></div>
+            <button class="btn btn-primary btn-block" @onclick="GoToDashboard">
+                @Local["Onboarding.Done.GoToDashboard"]
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="card onboarding-card">
+            <OnboardingProgress State="_state" ActiveStep="_step" OnStepClick="GoToStep" />
+
+            <div class="onboarding-body">
+                @if (_step == 0)
+                {
+                    <OnboardingAccounts State="_state" OnAccountsCreated="OnAccountsCreatedAsync" />
+                }
+                else if (_step == 1)
+                {
+                    <OnboardingCategories State="_state" OnCategoriesCreated="OnCategoriesCreatedAsync" />
+                }
+                else if (_step == 2)
+                {
+                    <OnboardingConcepts State="_state" OnConceptsCompleted="OnConceptsCompletedAsync" />
+                }
+                else
+                {
+                    @if (_profile is null)
+                    {
+                        <ErrorState Error="_error" OnRetry="LoadAsync" />
+                    }
+                    else
+                    {
+                        <VerifyEmailPanel Email="@_profile.Email" />
+                    }
+                }
+            </div>
+
+            @if (_step < 3)
+            {
+                <div class="onboarding-footer">
+                    <button class="btn btn-ghost" disabled="@(_step == 0)" @onclick="() => GoToStep(_step - 1)">
+                        <SvgIcon Name="chevron-left" Size="16" /> @Local["Action.Back"]
+                    </button>
+                    <button class="btn btn-primary" disabled="@(!_currentStepDone || _busy)" @onclick="() => GoToStep(_step + 1)">
+                        @Local["Action.Next"] <SvgIcon Name="chevron-right" Size="16" />
+                    </button>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private bool _loading = true;
+    private bool _busy;
+    private ApiErrorMessage? _error;
+    private OnboardingState? _state;
+    private UserProfile? _profile;
+    private int _step;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _profile = await Auth.GetProfileAsync();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _state = await OnboardingSvc.LoadAsync();
+            if (_profile is null)
+            {
+                _profile = await Auth.GetProfileAsync();
+            }
+            ComputeStep();
+        }
+        catch (Exception ex)
+        {
+            _error = ApiErrorMessage.From(ex);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ComputeStep()
+    {
+        if (_state is null) return;
+        _step = _state switch
+        {
+            { AccountsCompleted: false } => 0,
+            { CategoriesCompleted: false } => 1,
+            { TransactionsCompleted: false } => 2,
+            _ => 3
+        };
+    }
+
+    private async Task OnAccountsCreatedAsync()
+    {
+        _busy = true;
+        try
+        {
+            _state = await OnboardingSvc.LoadAsync();
+            if (_state.AccountsCompleted && _step < 1)
+                GoToStep(1);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task OnCategoriesCreatedAsync()
+    {
+        _busy = true;
+        try
+        {
+            _state = await OnboardingSvc.LoadAsync();
+            if (_state.CategoriesCompleted && _step < 2)
+                GoToStep(2);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task OnConceptsCompletedAsync()
+    {
+        _busy = true;
+        try
+        {
+            _state = await OnboardingSvc.LoadAsync();
+            if (_state.TransactionsCompleted && _step < 3)
+                GoToStep(3);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void GoToStep(int index)
+    {
+        _step = Math.Clamp(index, 0, 3);
+        StateHasChanged();
+    }
+
+    private void GoToDashboard() => Nav.NavigateTo("/");
+
+    private bool _currentStepDone => _state?.IsStepDone(_step) == true;
+}

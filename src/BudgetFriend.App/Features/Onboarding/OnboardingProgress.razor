@@ -1,0 +1,65 @@
+@inject LocalizationService Local
+
+<div class="onboarding-progress">
+    <div class="onboarding-progress-head">
+        <span class="muted small">@Local["Onboarding.Step.Progress", _steps[_active].Key, _steps.Length]</span>
+        <span class="strong small">@Local["Onboarding.Progress.Percent", State.Percent]</span>
+    </div>
+    <ProgressBar Value="State.Percent" Max="100" />
+
+    <div class="onboarding-steps" role="tablist" aria-label="@Local["Onboarding.Step.Progress", _steps[_active].Key, _steps.Length]">
+        @for (var i = 0; i < _steps.Length; i++)
+        {
+            var step = _steps[i];
+            var index = i;
+            var done = State.IsStepDone(index);
+            var active = _active == index;
+            var reachable = index <= _active || done || State.IsStepDone(index);
+            <button
+                type="button"
+                class="onboarding-step @(active ? "active" : "") @(done ? "done" : "")"
+                disabled="@(!reachable)"
+                @onclick="() => OnStepClickAsync(index)">
+                <span class="onboarding-step-dot">
+                    @if (done)
+                    {
+                        <SvgIcon Name="check" Size="14" />
+                    }
+                    else
+                    {
+                        <span>@(index + 1)</span>
+                    }
+                </span>
+                <span class="onboarding-step-label">@Local[step.Key]</span>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    private static readonly (string Icon, string Key)[] _steps =
+    {
+        ("wallet", "Onboarding.Step.Accounts"),
+        ("tag", "Onboarding.Step.Categories"),
+        ("list", "Onboarding.Step.Concepts"),
+        ("check", "Onboarding.Step.VerifyEmail"),
+    };
+
+    [Parameter, EditorRequired]
+    public OnboardingState State { get; set; } = new(false, false, false, false, false);
+
+    [Parameter]
+    public int ActiveStep { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnStepClick { get; set; }
+
+    private int _active;
+
+    protected override void OnParametersSet()
+    {
+        _active = Math.Clamp(ActiveStep, 0, _steps.Length - 1);
+    }
+
+    private async Task OnStepClickAsync(int index) => await OnStepClick.InvokeAsync(index);
+}

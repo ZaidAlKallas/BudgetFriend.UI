@@ -8,7 +8,7 @@
 @inject LocalizationService Local
 @implements IDisposable
 
-@if (_isAuthenticated)
+@if (_isAuthenticated && !_isSetupPage)
 {
     <div class="app-shell">
         <aside class="sidebar">
@@ -43,7 +43,7 @@ else
 {
     <div class="auth-chrome">
         <TopBar />
-        <div class="auth-shell">
+        <div class="auth-shell @(_isSetupPage ? "setup-shell" : "")">
             @Body
         </div>
     </div>
@@ -51,6 +51,8 @@ else
 
 @code {
     private bool _isAuthenticated;
+    private bool _isSetupPage;
+    private bool _routing;
     private DotNetObjectReference<MainLayout>? _self;
 
     // ---- Lifecycle -----------------------------------------------------------
@@ -106,27 +108,63 @@ else
         var state = await task;
         _isAuthenticated = state.User.Identity?.IsAuthenticated == true;
         await InvokeAsync(StateHasChanged);
-        HandleRouting();
+        _ = HandleRoutingAsync();
     }
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => HandleRouting();
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => _ = HandleRoutingAsync();
 
-    // Redirects anonymous users away from protected routes and authenticated
-    // users away from the auth pages. Route protection is enforced here (instead
-    // of endpoint-level [Authorize]) because authentication is JWT-in-handler.
-    private void HandleRouting()
+    // Routes the user based on auth state and email-verification status.
+    // Route protection is enforced here (instead of endpoint-level [Authorize])
+    // because authentication is JWT-in-handler. Onboarding (/onboarding) and
+    // email verification (/verify-email) render in the slim setup chrome; every
+    // other route gets the full app shell. Unverified users are pulled back to
+    // /verify-email regardless of which protected page they hit.
+    private async Task HandleRoutingAsync()
     {
-        var path = Nav.ToBaseRelativePath(Nav.Uri).Trim('/').ToLowerInvariant();
-        var isProtected = path is "" or "accounts" or "transactions" or "transfers" or "categories" or "settings";
-        var isAuthPage = path is "login" or "register" or "forgot-password";
-
-        if (!_isAuthenticated && isProtected)
+        if (_routing)
         {
-            Nav.NavigateTo("/login");
+            return;
         }
-        else if (_isAuthenticated && isAuthPage)
+
+        _routing = true;
+        try
         {
-            Nav.NavigateTo("/");
+            var path = Nav.ToBaseRelativePath(Nav.Uri).Trim('/').ToLowerInvariant();
+
+            if (_isAuthenticated)
+            {
+                _isSetupPage = path is "onboarding" or "verify-email";
+
+                var profile = await Auth.GetProfileAsync();
+                var isKnownUnverified = profile is not null && !profile.IsEmailVerified;
+
+                if (path is "login" or "register" or "forgot-password")
+                {
+                    Nav.NavigateTo(profile?.IsEmailVerified == true ? "/" : "/onboarding");
+                }
+                else if (isKnownUnverified && path is not ("onboarding" or "verify-email"))
+                {
+                    Nav.NavigateTo("/verify-email");
+                }
+            }
+            else
+            {
+                _isSetupPage = false;
+                var isProtected = path is ""
+                    or "accounts" or "transactions" or "transfers" or "categories" or "settings"
+                    or "onboarding";
+
+                if (isProtected)
+                {
+                    Nav.NavigateTo("/login");
+                }
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+        finally
+        {
+            _routing = false;
         }
     }
 

@@ -1,0 +1,244 @@
+@inherits LocalizedComponentBase
+@inject IAccountService AccountsService
+@inject FinanceFormatter Formatter
+
+<div class="onboarding-panel">
+    <div class="onboarding-icon">
+        <SvgIcon Name="wallet" Size="28" />
+    </div>
+    <h2 class="page-title">@Local["Onboarding.Accounts.Title"]</h2>
+    <p class="form-note">@Local["Onboarding.Accounts.Description"]</p>
+
+    @if (_accounts is { Count: > 0 })
+    {
+        <div class="chip chip-income">@Local["Onboarding.Accounts.Count", _accounts.Count]</div>
+        <div class="onboarding-chip-list">
+            @foreach (var account in _accounts)
+            {
+                <div class="chip">
+                    <SvgIcon Name="wallet" Size="13" /> @account.Name
+                    <span class="muted">· @Formatter.Currency(account.CurrentBalance, account.Currency)</span>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="seed-section">
+        <h3 class="card-title">@Local["Onboarding.Seed.Title"]</h3>
+        <p class="form-note small">@Local["Onboarding.Accounts.Seed.Description"]</p>
+        <div class="seed-chips">
+            @foreach (var key in _accountSuggestions)
+            {
+                var isSelected = _drafts.Any(d => d.SourceKey == key);
+                <button type="button" class="seed-chip @(isSelected ? "selected" : "")" aria-pressed="@isSelected"
+                        @onclick="() => ToggleSuggestion(key)">
+                    <SvgIcon Name="wallet" Size="14" /> @Local[key]
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="form-divider"><span>@Local["Auth.Or"]</span></div>
+
+    <EditForm Model="_form" OnValidSubmit="AddToBasket" FormName="onboarding-account-form">
+        <DataAnnotationsValidator />
+        <div class="grid grid-2" style="gap:10px;">
+            <div class="field">
+                <label>@Local["Account.Name"]</label>
+                <InputText @bind-Value="_form.Name" class="input" autocomplete="off" />
+                <ValidationMessage For="() => _form.Name" />
+            </div>
+            <div class="field">
+                <label>@Local["Account.InitialBalance"]</label>
+                <InputNumber @bind-Value="_form.InitialBalance" class="input" />
+                <ValidationMessage For="() => _form.InitialBalance" />
+            </div>
+        </div>
+        <div class="field">
+            <label>@Local["Account.Currency"]</label>
+            <select class="input" @bind="_form.Currency">
+                @foreach (var currencyCode in _currencies)
+                {
+                    <option value="@currencyCode">@currencyCode</option>
+                }
+            </select>
+        </div>
+        <button class="btn btn-outline btn-block" type="submit">
+            <SvgIcon Name="plus" Size="15" /> @Local["Onboarding.Seed.AddToList"]
+        </button>
+    </EditForm>
+
+    @if (_drafts.Count > 0)
+    {
+        <div class="draft-section">
+            <h3 class="card-title">@Local["Onboarding.Seed.ReadyToAdd", _drafts.Count]</h3>
+            <div class="draft-list">
+                @foreach (var draft in _drafts)
+                {
+                    <div class="draft-row account">
+                        <input class="input" @bind="draft.Name" autocomplete="off" aria-label="@Local["Account.Name"]" />
+                        <input class="input" @bind="draft.InitialBalance" type="number" step="0.01" aria-label="@Local["Account.InitialBalance"]" />
+                        <select class="input" @bind="draft.Currency" aria-label="@Local["Account.Currency"]">
+                            @foreach (var currencyCode in _currencies)
+                            {
+                                <option value="@currencyCode">@currencyCode</option>
+                            }
+                        </select>
+                        <button type="button" class="icon-btn" @onclick="() => RemoveDraft(draft)" title="@Local["Action.Remove"]">
+                            <SvgIcon Name="x" Size="16" />
+                        </button>
+                    </div>
+                }
+            </div>
+
+            @if (_error is not null)
+            {
+                <div class="validation-message" role="alert">@_error</div>
+            }
+
+            <button class="btn btn-primary btn-block" disabled="@(_busy || _drafts.Count == 0)" @onclick="CreateAllAsync">
+                @if (_busy)
+                {
+                    <span class="spinner"></span>
+                }
+                <SvgIcon Name="plus" Size="15" /> @Local["Onboarding.Seed.CreateAll", _drafts.Count]
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private static readonly Currency[] _currencies = Enum.GetValues<Currency>();
+
+    private static readonly string[] _accountSuggestions =
+    {
+        "Onboarding.Seed.Account.Checking",
+        "Onboarding.Seed.Account.Savings",
+        "Onboarding.Seed.Account.Wallet",
+        "Onboarding.Seed.Account.Debit",
+        "Onboarding.Seed.Account.Credit",
+    };
+
+    private readonly AccountFormModel _form = new();
+    private readonly List<AccountDraft> _drafts = new();
+    private IReadOnlyList<AccountDto>? _accounts;
+    private string? _error;
+    private bool _busy;
+
+    [Parameter, EditorRequired]
+    public OnboardingState State { get; set; } = new(false, false, false, false, false);
+
+    [Parameter]
+    public EventCallback OnAccountsCreated { get; set; }
+
+    protected override async Task OnInitializedAsync() => await LoadAccountsAsync();
+
+    private async Task LoadAccountsAsync()
+    {
+        try
+        {
+            _accounts = await AccountsService.GetAccountsAsync();
+            _form.Currency = _accounts.Count > 0 ? _accounts[0].Currency : _currencies[0];
+        }
+        catch (Exception ex)
+        {
+            _error = BuildError(ex);
+        }
+    }
+
+    private void ToggleSuggestion(string key)
+    {
+        var existing = _drafts.FirstOrDefault(d => d.SourceKey == key);
+        if (existing is not null)
+        {
+            _drafts.Remove(existing);
+            return;
+        }
+
+        _drafts.Add(new AccountDraft
+        {
+            SourceKey = key,
+            Name = Local[key],
+            InitialBalance = 0,
+            Currency = _form.Currency ?? _currencies[0]
+        });
+    }
+
+    private void AddToBasket()
+    {
+        if (string.IsNullOrWhiteSpace(_form.Name))
+        {
+            return;
+        }
+
+        _drafts.Add(new AccountDraft
+        {
+            SourceKey = null,
+            Name = _form.Name!.Trim(),
+            InitialBalance = _form.InitialBalance,
+            Currency = _form.Currency ?? _currencies[0]
+        });
+        _form.Name = "";
+        _form.InitialBalance = 0;
+    }
+
+    private void RemoveDraft(AccountDraft draft) => _drafts.Remove(draft);
+
+    private async Task CreateAllAsync()
+    {
+        if (_busy || _drafts.Count == 0) return;
+        if (_drafts.Any(d => string.IsNullOrWhiteSpace(d.Name)))
+        {
+            _error = Local["Onboarding.Seed.NameRequired"];
+            return;
+        }
+
+        _busy = true;
+        _error = null;
+        try
+        {
+            foreach (var draft in _drafts.ToArray())
+            {
+                await AccountsService.CreateAccountAsync(new CreateAccountRequest(draft.Name.Trim(), draft.InitialBalance, draft.Currency));
+            }
+            _drafts.Clear();
+            await LoadAccountsAsync();
+            await OnAccountsCreated.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = BuildError(ex);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private string? BuildError(Exception ex)
+    {
+        var error = ApiErrorMessage.From(ex);
+        if (error.FieldErrors.Count > 0)
+            return string.Join(", ", error.FieldErrors);
+        if (!string.IsNullOrWhiteSpace(error.Detail))
+            return error.Detail;
+        return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class AccountFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string? Name { get; set; }
+
+        public decimal InitialBalance { get; set; }
+        public Currency? Currency { get; set; }
+    }
+
+    public sealed class AccountDraft
+    {
+        public string? SourceKey { get; set; }
+        public string Name { get; set; } = "";
+        public decimal InitialBalance { get; set; }
+        public Currency Currency { get; set; } = Currency.USD;
+    }
+}

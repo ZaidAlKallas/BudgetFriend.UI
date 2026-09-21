@@ -46,10 +46,11 @@ public static class MauiProgram {
         services.AddSingleton<ISystemThemeProvider, MauiSystemThemeProvider>();
         services.AddSingleton<IConnectivityService, MauiConnectivityService>();
 
-        // App-level state services (scoped == the single BlazorWebView scope).
+// App-level state services (scoped == the single BlazorWebView scope).
         services.AddScoped<LocalizationService>();
         services.AddScoped<ThemeService>();
         services.AddScoped<FinanceFormatter>();
+        services.AddScoped<OnboardingService>();
 
         // Auth: the dual AuthenticationStateProvider + IAuthService.
         services.AddScoped<IAuthApi, AuthApi>();
