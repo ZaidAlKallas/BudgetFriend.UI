@@ -151,11 +151,11 @@ public sealed class AuthService : AuthenticationStateProvider, IAuthService {
     public Task ForgotPasswordAsync(string email, CancellationToken ct = default)
         => _authApi.ForgotPasswordAsync(new ForgotPasswordRequest(email), ct);
 
-    public Task ResetPasswordAsync(string token, string newPassword, CancellationToken ct = default)
-        => _authApi.ResetPasswordAsync(new ResetPasswordRequest(token, newPassword), ct);
+    public Task ResetPasswordAsync(string email, string code, string newPassword, CancellationToken ct = default)
+        => _authApi.ResetPasswordAsync(new ResetPasswordRequest(email, code, newPassword), ct);
 
-    public Task VerifyEmailAsync(string token, CancellationToken ct = default)
-        => _authApi.VerifyEmailAsync(new VerifyEmailRequest(token), ct);
+    public Task VerifyEmailAsync(string email, string code, CancellationToken ct = default)
+        => _authApi.VerifyEmailAsync(new VerifyEmailRequest(email, code), ct);
 
     public Task ResendVerificationAsync(string email, CancellationToken ct = default)
         => _authApi.ResendVerificationAsync(new ResendVerificationRequest(email), ct);

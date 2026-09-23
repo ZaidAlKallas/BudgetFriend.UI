@@ -8,62 +8,131 @@
     <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.Title"]</h2>
     <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Verify.Description", Email]</p>
 
-    @if (_error is not null)
-    {
-        <div class="validation-message" role="alert">@_error</div>
-    }
     @if (_success is not null)
     {
         <div class="form-success" role="status">@_success</div>
     }
 
-    <div class="verify-resend">
-        <button class="btn btn-ghost" disabled="@_resendBusy" @onclick="ResendAsync">
-            @if (_resendBusy)
+    @if (!_verified)
+    {
+        <EditForm Model="_model" OnValidSubmit="SubmitAsync" FormName="verify-panel-form">
+            <DataAnnotationsValidator />
+            <div class="field">
+                <label for="vp-code">@Local["Auth.VerificationCode"]</label>
+                <InputText id="vp-code" @bind-Value="_model.Code" class="input verify-code-input"
+                           inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" />
+                <ValidationMessage For="() => _model.Code" />
+            </div>
+
+            @if (_error is not null)
             {
-                <span class="spinner"></span>
+                <div class="validation-message" role="alert">@_error</div>
             }
-            <SvgIcon Name="refresh" Size="15" /> @Local["Auth.ResendVerification"]
-        </button>
+
+            <button class="btn btn-primary btn-block" disabled="@_busy" type="submit">
+                @if (_busy)
+                {
+                    <span class="spinner"></span>
+                }
+                @Local["Auth.VerifyEmail"]
+            </button>
+        </EditForm>
+    }
+
+    <div class="verify-resend">
+        <ResendCooldownButton @ref="_resend" Label="@Local["Auth.ResendVerification"]" OnResend="ResendAsync" />
     </div>
 </div>
 
 @code {
-    private bool _resendBusy;
+    private readonly VerifyCodeForm _model = new();
+    private ResendCooldownButton? _resend;
+    private bool _busy;
+    private bool _verified;
     private string? _error;
     private string? _success;
 
     [Parameter, EditorRequired]
     public string Email { get; set; } = "";
 
+    /// <summary>Invoked once the email was verified successfully.</summary>
+    [Parameter]
+    public EventCallback OnVerified { get; set; }
+
+    private async Task SubmitAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        _error = null;
+        _success = null;
+        try
+        {
+            await Auth.VerifyEmailAsync(Email, _model.Code!.Trim());
+        }
+        catch (Exception ex)
+        {
+            var message = BuildError(ApiErrorMessage.From(ex));
+            _error = message;
+            if (VerificationCodeErrors.Classify(message) is VerificationCodeFailure.Expired or VerificationCodeFailure.LockedOut)
+            {
+                _model.Code = null;
+            }
+            return;
+        }
+        finally
+        {
+            _busy = false;
+        }
+
+        // Verification already succeeded server-side. Notifying the parent must
+        // never surface as an error here, so it runs outside the try/catch.
+        _verified = true;
+        _success = Local["Verify.Success"];
+        try
+        {
+            await OnVerified.InvokeAsync();
+        }
+        catch
+        {
+            // The parent (Onboarding) refreshes its own state and shows the
+            // welcome screen; a reload failure must not mask the success UI.
+        }
+    }
+
     private async Task ResendAsync()
     {
-        if (_resendBusy) return;
-        _resendBusy = true;
         _error = null;
         _success = null;
         try
         {
             await Auth.ResendVerificationAsync(Email);
             _success = Local["Verify.Sent"];
+            _resend?.StartCooldown();
         }
         catch (Exception ex)
         {
-            _error = BuildError(ex);
-        }
-        finally
-        {
-            _resendBusy = false;
+            var apiError = ApiErrorMessage.From(ex);
+            _error = BuildError(apiError);
+            if (apiError.StatusCode == 429)
+            {
+                _resend?.StartCooldown();
+            }
         }
     }
 
-    private string? BuildError(Exception ex)
+    private string BuildError(ApiErrorMessage error)
     {
-        var error = ApiErrorMessage.From(ex);
         if (error.FieldErrors.Count > 0)
             return string.Join(", ", error.FieldErrors);
         if (!string.IsNullOrWhiteSpace(error.Detail))
             return error.Detail;
         return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class VerifyCodeForm
+    {
+        [Required(ErrorMessage = "Code is required.")]
+        [RegularExpression(@"^[0-9]{6}$", ErrorMessage = "Enter the 6-digit code.")]
+        public string? Code { get; set; }
     }
 }

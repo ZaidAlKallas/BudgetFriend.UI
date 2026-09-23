@@ -13,7 +13,7 @@ public interface IAuthService {
     Task<UserProfile?> GetProfileAsync(CancellationToken ct = default);
     Task<UserProfile?> RefreshProfileAsync(CancellationToken ct = default);
     Task ForgotPasswordAsync(string email, CancellationToken ct = default);
-    Task ResetPasswordAsync(string token, string newPassword, CancellationToken ct = default);
-    Task VerifyEmailAsync(string token, CancellationToken ct = default);
+    Task ResetPasswordAsync(string email, string code, string newPassword, CancellationToken ct = default);
+    Task VerifyEmailAsync(string email, string code, CancellationToken ct = default);
     Task ResendVerificationAsync(string email, CancellationToken ct = default);
 }

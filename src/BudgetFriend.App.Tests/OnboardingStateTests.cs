@@ -104,7 +104,7 @@ public class OnboardingStateTests {
     // ---- Fakes --------------------------------------------------------------
 
     private sealed class FakePreferenceStore : IPreferenceStore {
-        private readonly Dictionary<string, string> _values = new();
+        private readonly Dictionary<string, string> _values = [];
 
         public Task<string?> GetAsync(string key) =>
             Task.FromResult(_values.TryGetValue(key, out var value) ? value : null);
@@ -176,9 +176,9 @@ public class OnboardingStateTests {
 
         public Task ForgotPasswordAsync(string email, CancellationToken ct = default) => Task.CompletedTask;
 
-        public Task ResetPasswordAsync(string token, string newPassword, CancellationToken ct = default) => Task.CompletedTask;
+        public Task ResetPasswordAsync(string email, string code, string newPassword, CancellationToken ct = default) => Task.CompletedTask;
 
-        public Task VerifyEmailAsync(string token, CancellationToken ct = default) => Task.CompletedTask;
+        public Task VerifyEmailAsync(string email, string code, CancellationToken ct = default) => Task.CompletedTask;
 
         public Task ResendVerificationAsync(string email, CancellationToken ct = default) => Task.CompletedTask;
     }

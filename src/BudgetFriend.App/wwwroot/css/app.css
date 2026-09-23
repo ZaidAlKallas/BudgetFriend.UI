@@ -1516,6 +1516,12 @@ table.data tbody tr:hover {
   min-height: 40px;
 }
 
+.resend-countdown {
+  color: var(--bf-text-3);
+  margin-inline-start: 6px;
+  white-space: nowrap;
+}
+
 .onboarding-done {
   padding: 28px;
 }

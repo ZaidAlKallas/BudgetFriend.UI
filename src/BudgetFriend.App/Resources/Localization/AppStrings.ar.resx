@@ -77,6 +77,12 @@
   <data name="Auth.ResetPassword" xml:space="preserve"><value>إعادة تعيين كلمة المرور</value></data>
   <data name="Auth.VerifyEmail" xml:space="preserve"><value>تحقق من البريد الإلكتروني</value></data>
   <data name="Auth.ResendVerification" xml:space="preserve"><value>إعادة إرسال التحقق</value></data>
+  <data name="Auth.VerificationCode" xml:space="preserve"><value>رمز التحقق</value></data>
+  <data name="Auth.NewPassword" xml:space="preserve"><value>كلمة المرور الجديدة</value></data>
+  <data name="Auth.ConfirmNewPassword" xml:space="preserve"><value>تأكيد كلمة المرور الجديدة</value></data>
+  <data name="Auth.SendResetCode" xml:space="preserve"><value>إرسال رمز إعادة الضبط</value></data>
+  <data name="Auth.ResendCode" xml:space="preserve"><value>إعادة إرسال الرمز</value></data>
+  <data name="Auth.EnterEmailFirst" xml:space="preserve"><value>أدخل بريدك الإلكتروني أولًا.</value></data>
   <data name="Auth.SignInWithGoogle" xml:space="preserve"><value>تسجيل الدخول بحساب Google</value></data>
   <data name="Auth.Or" xml:space="preserve"><value>أو</value></data>
   <data name="Auth.GoogleUnavailable" xml:space="preserve"><value>تسجيل الدخول بحساب Google غير مُفعّل بعد.</value></data>
@@ -202,6 +208,7 @@
   <data name="Validation.InvalidEmail" xml:space="preserve"><value>يرجى إدخال بريد إلكتروني صالح.</value></data>
   <data name="Validation.PasswordMismatch" xml:space="preserve"><value>كلمتا المرور غير متطابقتين.</value></data>
   <data name="Validation.PasswordTooShort" xml:space="preserve"><value>يجب أن تكون كلمة المرور 6 أحرف على الأقل.</value></data>
+  <data name="Validation.PasswordPolicy" xml:space="preserve"><value>يجب أن تتكون كلمة المرور من 8-128 حرفًا وأن تحتوي على حرف كبير وحرف صغير ورقمًا ورمزًا خاصًا.</value></data>
 
   <!-- Error messages -->
   <data name="Error.Network" xml:space="preserve"><value>يتعذر الاتصال. يرجى التحقق من اتصالك بالإنترنت.</value></data>
@@ -273,15 +280,19 @@
 
   <!-- Email verification -->
   <data name="Verify.Title" xml:space="preserve"><value>تحقق من بريدك الإلكتروني</value></data>
-  <data name="Verify.Description" xml:space="preserve"><value>أرسلنا رابط التحقق إلى {0}. اضغط عليه لتأكيد بريدك الإلكتروني — الرابط صالح لمدة 24 ساعة.</value></data>
-  <data name="Verify.Sent" xml:space="preserve"><value>تم إرسال رابط تحقق جديد.</value></data>
-  <data name="Verify.Invalid.Title" xml:space="preserve"><value>لم يعمل هذا الرابط</value></data>
+  <data name="Verify.Description" xml:space="preserve"><value>أرسلنا رمزًا من 6 أرقام إلى {0}. أدخله لتأكيد بريدك الإلكتروني — الرمز صالح لمدة 15 دقيقة.</value></data>
+  <data name="Verify.DescriptionAnon" xml:space="preserve"><value>أدخل البريد الذي سجلت به والرمز المكوَّن من 6 أرقام الذي أرسلناه إليك.</value></data>
+  <data name="Verify.Sent" xml:space="preserve"><value>تم إرسال رمز تحقق جديد.</value></data>
+  <data name="Verify.Success" xml:space="preserve"><value>تم التحقق من بريدك الإلكتروني.</value></data>
   <data name="Verify.ContinueToLogin" xml:space="preserve"><value>متابعة إلى تسجيل الدخول</value></data>
-  <data name="Verify.ResendForm.Title" xml:space="preserve"><value>اطلب رابطًا جديدًا</value></data>
-  <data name="Verify.ResendForm.Description" xml:space="preserve"><value>أدخل بريدك الإلكتروني وسنرسل لك رابط تحقق جديدًا.</value></data>
   <data name="Verify.Already.Title" xml:space="preserve"><value>تم التحقق مسبقًا</value></data>
   <data name="Verify.Already.Description" xml:space="preserve"><value>بريدك الإلكتروني موثّق. لا يوجد ما يجب فعله هنا.</value></data>
   <data name="Verify.Welcome.Title" xml:space="preserve"><value>أهلًا بك في BudgetFriend!</value></data>
   <data name="Verify.Welcome.Description" xml:space="preserve"><value>كل شيء جاهز. أضف بعض مداخيلك ومصروفاتك اليوم، وشاهد كيف تتحول العادات الصغيرة إلى مدخرات حقيقية.</value></data>
   <data name="Verify.Welcome.CtaStart" xml:space="preserve"><value>ابدأ إدارة ميزانيتك</value></data>
+
+  <!-- Password reset -->
+  <data name="Reset.Code.Description" xml:space="preserve"><value>أدخل الرمز المكوَّن من 6 أرقام الذي أرسلناه إلى {0}. الرمز صالح لمدة 15 دقيقة.</value></data>
+  <data name="Reset.CodeResent" xml:space="preserve"><value>تم إرسال رمز جديد لإعادة تعيين كلمة المرور.</value></data>
+  <data name="Reset.Done.Message" xml:space="preserve"><value>تمت إعادة تعيين كلمة مرورك. يرجى تسجيل الدخول بكلمة المرور الجديدة.</value></data>
 </root>

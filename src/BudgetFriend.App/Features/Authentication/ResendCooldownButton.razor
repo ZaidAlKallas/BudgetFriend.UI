@@ -1,0 +1,88 @@
+@implements IDisposable
+
+<button class="btn btn-ghost" disabled="@(_busy || _remaining > 0)" @onclick="TriggerAsync">
+    @if (_busy)
+    {
+        <span class="spinner"></span>
+    }
+    <SvgIcon Name="refresh" Size="15" /> @Label
+    @if (_remaining > 0)
+    {
+        <span class="resend-countdown">(@_remaining s)</span>
+    }
+</button>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public int CooldownSeconds { get; set; } = 120;
+
+    [Parameter]
+    public EventCallback OnResend { get; set; }
+
+    private bool _busy;
+    private int _remaining;
+    private System.Threading.Timer? _timer;
+
+    /// <summary>
+    /// Locks the button for <see cref="CooldownSeconds"/> seconds, counting down
+    /// in the label. Call after a successful code send to keep the client within
+    /// the API's <c>EmailPolicy</c> (5 sends per 10 minutes).
+    /// </summary>
+    public void StartCooldown()
+    {
+        _remaining = CooldownSeconds;
+        StopTimer();
+        _timer = new System.Threading.Timer(OnTick, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void OnTick(object? state)
+    {
+        _ = InvokeAsync(() =>
+        {
+            if (_remaining > 1)
+            {
+                _remaining--;
+                StateHasChanged();
+            }
+            else
+            {
+                _remaining = 0;
+                StopTimer();
+                StateHasChanged();
+            }
+        });
+    }
+
+    private async Task TriggerAsync()
+    {
+        if (_busy || _remaining > 0)
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            await OnResend.InvokeAsync();
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void StopTimer()
+    {
+        _timer?.Dispose();
+        _timer = null;
+    }
+
+    public void Dispose()
+    {
+        StopTimer();
+    }
+}

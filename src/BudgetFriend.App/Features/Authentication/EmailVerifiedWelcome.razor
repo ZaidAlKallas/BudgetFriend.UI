@@ -1,0 +1,33 @@
+@inherits LocalizedComponentBase
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<div class="card auth-card verify-welcome">
+    <div class="welcome-icon">
+        <SvgIcon Name="check" Size="34" />
+    </div>
+    <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.Welcome.Title"]</h2>
+    <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Verify.Welcome.Description"]</p>
+    <button class="btn btn-primary btn-block" disabled="@_busy" @onclick="ContinueAsync">
+        @Local[Auth.IsAuthenticated ? "Verify.Welcome.CtaStart" : "Auth.Login"]
+    </button>
+</div>
+
+@code {
+    private bool _busy;
+
+    private async Task ContinueAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        if (Auth.IsAuthenticated)
+        {
+            await Auth.RefreshProfileAsync();
+            Nav.NavigateTo("/", forceLoad: true);
+        }
+        else
+        {
+            Nav.NavigateTo("/login");
+        }
+    }
+}

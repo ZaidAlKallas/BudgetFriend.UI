@@ -3,7 +3,6 @@
 @attribute [Authorize]
 @inject OnboardingService OnboardingSvc
 @inject IAuthService Auth
-@inject NavigationManager Nav
 
 <div class="onboarding">
     <div class="brand-large" style="justify-content:flex-start; margin-bottom:10px;">
@@ -23,17 +22,7 @@
     }
     else if (_state.IsComplete)
     {
-        <div class="card auth-card onboarding-done">
-            <div class="onboarding-icon" style="margin:0 auto 14px;">
-                <SvgIcon Name="check" Size="28" />
-            </div>
-            <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Onboarding.Done.Title"]</h2>
-            <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Onboarding.Done.Description"]</p>
-            <div style="margin-bottom:20px;"><ProgressBar Value="100" Max="100" /></div>
-            <button class="btn btn-primary btn-block" @onclick="GoToDashboard">
-                @Local["Onboarding.Done.GoToDashboard"]
-            </button>
-        </div>
+        <EmailVerifiedWelcome />
     }
     else
     {
@@ -61,7 +50,7 @@
                     }
                     else
                     {
-                        <VerifyEmailPanel Email="@_profile.Email" />
+                        <VerifyEmailPanel Email="@_profile.Email" OnVerified="OnVerifiedAsync" />
                     }
                 }
             </div>
@@ -175,13 +164,36 @@
         }
     }
 
+    private async Task OnVerifiedAsync()
+    {
+        _profile = await Auth.RefreshProfileAsync();
+
+        try
+        {
+            _state = await OnboardingSvc.LoadAsync();
+        }
+        catch
+        {
+            // A secondary fetch (accounts/categories/preferences) failing must not
+            // hide the welcome screen: the email was already verified on the server.
+            _state = null;
+        }
+
+        if (_state is null || !_state.EmailVerified)
+        {
+            _state = _state is null
+                ? new OnboardingState(true, false, false, false, EmailVerified: true)
+                : _state with { EmailVerified = true };
+        }
+
+        StateHasChanged();
+    }
+
     private void GoToStep(int index)
     {
         _step = Math.Clamp(index, 0, 3);
         StateHasChanged();
     }
-
-    private void GoToDashboard() => Nav.NavigateTo("/");
 
     private bool _currentStepDone => _state?.IsStepDone(_step) == true;
 }

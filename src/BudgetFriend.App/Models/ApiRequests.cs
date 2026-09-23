@@ -4,11 +4,11 @@ namespace BudgetFriend.App.Models;
 public sealed record RegisterRequest(string Email, string Password, string FirstName, string? LastName);
 public sealed record LoginRequest(string Email, string Password);
 public sealed record RefreshTokenRequest(string RefreshToken);
-public sealed record VerifyEmailRequest(string Token);
+public sealed record VerifyEmailRequest(string Email, string Code);
 public sealed record ResendVerificationRequest(string Email);
 public sealed record GoogleLoginRequest(string IdToken);
 public sealed record ForgotPasswordRequest(string Email);
-public sealed record ResetPasswordRequest(string Token, string NewPassword);
+public sealed record ResetPasswordRequest(string Email, string Code, string NewPassword);
 
 // Accounts
 public sealed record CreateAccountRequest(string Name, decimal InitialBalance, Currency Currency);

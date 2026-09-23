@@ -77,6 +77,12 @@
   <data name="Auth.ResetPassword" xml:space="preserve"><value>Reset password</value></data>
   <data name="Auth.VerifyEmail" xml:space="preserve"><value>Verify email</value></data>
   <data name="Auth.ResendVerification" xml:space="preserve"><value>Resend verification</value></data>
+  <data name="Auth.VerificationCode" xml:space="preserve"><value>Verification code</value></data>
+  <data name="Auth.NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="Auth.ConfirmNewPassword" xml:space="preserve"><value>Confirm new password</value></data>
+  <data name="Auth.SendResetCode" xml:space="preserve"><value>Send reset code</value></data>
+  <data name="Auth.ResendCode" xml:space="preserve"><value>Resend code</value></data>
+  <data name="Auth.EnterEmailFirst" xml:space="preserve"><value>Enter your email first.</value></data>
   <data name="Auth.SignInWithGoogle" xml:space="preserve"><value>Sign in with Google</value></data>
   <data name="Auth.Or" xml:space="preserve"><value>or</value></data>
   <data name="Auth.GoogleUnavailable" xml:space="preserve"><value>Google sign-in is not configured.</value></data>
@@ -202,6 +208,7 @@
   <data name="Validation.InvalidEmail" xml:space="preserve"><value>Please enter a valid email address.</value></data>
   <data name="Validation.PasswordMismatch" xml:space="preserve"><value>The passwords do not match.</value></data>
   <data name="Validation.PasswordTooShort" xml:space="preserve"><value>Password must be at least 6 characters.</value></data>
+  <data name="Validation.PasswordPolicy" xml:space="preserve"><value>Password must be 8-128 characters and include an uppercase letter, a lowercase letter, a number and a special character.</value></data>
 
   <!-- Error messages -->
   <data name="Error.Network" xml:space="preserve"><value>Unable to connect. Please check your internet connection.</value></data>
@@ -273,15 +280,19 @@
 
   <!-- Email verification -->
   <data name="Verify.Title" xml:space="preserve"><value>Verify your email</value></data>
-  <data name="Verify.Description" xml:space="preserve"><value>We sent a verification link to {0}. Click it to confirm your email — it expires in 24 hours.</value></data>
-  <data name="Verify.Sent" xml:space="preserve"><value>A new verification link is on its way.</value></data>
-  <data name="Verify.Invalid.Title" xml:space="preserve"><value>This link didn't work</value></data>
+  <data name="Verify.Description" xml:space="preserve"><value>We sent a 6-digit code to {0}. Enter it to confirm your email — it expires in 15 minutes.</value></data>
+  <data name="Verify.DescriptionAnon" xml:space="preserve"><value>Enter the email you registered with and the 6-digit code we sent you.</value></data>
+  <data name="Verify.Sent" xml:space="preserve"><value>A new verification code is on its way.</value></data>
+  <data name="Verify.Success" xml:space="preserve"><value>Your email has been verified.</value></data>
   <data name="Verify.ContinueToLogin" xml:space="preserve"><value>Continue to login</value></data>
-  <data name="Verify.ResendForm.Title" xml:space="preserve"><value>Request a new link</value></data>
-  <data name="Verify.ResendForm.Description" xml:space="preserve"><value>Enter your email and we'll send you a fresh verification link.</value></data>
   <data name="Verify.Already.Title" xml:space="preserve"><value>Already verified</value></data>
   <data name="Verify.Already.Description" xml:space="preserve"><value>Your email is verified. There's nothing left to do here.</value></data>
   <data name="Verify.Welcome.Title" xml:space="preserve"><value>Welcome to BudgetFriend!</value></data>
   <data name="Verify.Welcome.Description" xml:space="preserve"><value>You're all set. Add a couple of income and expense entries today, and watch how small habits grow into real savings.</value></data>
   <data name="Verify.Welcome.CtaStart" xml:space="preserve"><value>Start budgeting</value></data>
+
+  <!-- Password reset -->
+  <data name="Reset.Code.Description" xml:space="preserve"><value>Enter the 6-digit code we sent to {0}. It expires in 15 minutes.</value></data>
+  <data name="Reset.CodeResent" xml:space="preserve"><value>A new password reset code has been sent.</value></data>
+  <data name="Reset.Done.Message" xml:space="preserve"><value>Your password has been reset. Please sign in with your new password.</value></data>
 </root>

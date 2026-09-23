@@ -2,7 +2,6 @@
 @page "/verify-email"
 @inject IAuthService Auth
 @inject NavigationManager Nav
-@inject IJSRuntime JS
 
 <div class="verify-page">
     <div class="brand-large" style="justify-content:center; margin-bottom:10px;">
@@ -10,234 +9,148 @@
         <span>BudgetFriend</span>
     </div>
 
-    @if (_verifying)
+    @if (_verified)
+    {
+        <EmailVerifiedWelcome />
+    }
+    else if (Auth.IsAuthenticated && _profile is null)
     {
         <div class="card auth-card">
             <LoadingIndicator />
         </div>
     }
-    else if (_verified)
+    else if (Auth.IsAuthenticated && _profile?.IsEmailVerified == true)
     {
-        <div class="card auth-card verify-welcome">
-            <div class="welcome-icon">
-                <SvgIcon Name="check" Size="34" />
+        <div class="card auth-card onboarding-done">
+            <div class="onboarding-icon" style="margin:0 auto 14px;">
+                <SvgIcon Name="check" Size="28" />
             </div>
-            <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.Welcome.Title"]</h2>
-            <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Verify.Welcome.Description"]</p>
-            <button class="btn btn-primary btn-block" disabled="@_navigating" @onclick="ContinueAsync">
-                @Local[_ctaKey]
+            <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.Already.Title"]</h2>
+            <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Verify.Already.Description"]</p>
+            <button class="btn btn-primary btn-block" @onclick="GoToDashboard">
+                @Local["Onboarding.Done.GoToDashboard"]
             </button>
         </div>
     }
-    else if (_tokenError is not null)
+    else
     {
         <div class="card auth-card">
             <div class="onboarding-icon" style="margin:0 auto 14px;">
-                <SvgIcon Name="info" Size="26" />
+                <SvgIcon Name="check" Size="26" />
             </div>
-            <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.Invalid.Title"]</h2>
-            <p class="form-note" style="text-align:center; margin-bottom:18px;">@_tokenError</p>
-            <div class="verify-resend">
-                <button class="btn btn-primary btn-block" @onclick="ShowResendForm">
-                    @Local["Verify.ResendForm.Title"]
-                </button>
-            </div>
-        </div>
-    }
-    else if (Auth.IsAuthenticated)
-    {
-        @if (_profile is null)
-        {
-            <div class="card auth-card">
-                <LoadingIndicator />
-            </div>
-        }
-        else if (_profile.IsEmailVerified)
-        {
-            <div class="card auth-card onboarding-done">
-                <div class="onboarding-icon" style="margin:0 auto 14px;">
-                    <SvgIcon Name="check" Size="28" />
-                </div>
-                <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.Already.Title"]</h2>
-                <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Verify.Already.Description"]</p>
-                <button class="btn btn-primary btn-block" @onclick="GoToDashboard">
-                    @Local["Onboarding.Done.GoToDashboard"]
-                </button>
-            </div>
-        }
-        else
-        {
-            <VerifyEmailPanel Email="@_profile.Email" />
-        }
-    }
-    else
-    {
-        @if (_showResendForm)
-        {
-            <div class="card auth-card">
-                <div class="onboarding-icon" style="margin:0 auto 14px;">
-                    <SvgIcon Name="refresh" Size="26" />
-                </div>
-                <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.ResendForm.Title"]</h2>
-                <p class="form-note" style="text-align:center; margin-bottom:18px;">@Local["Verify.ResendForm.Description"]</p>
+            <h2 class="page-title" style="text-align:center; margin-bottom:8px;">@Local["Verify.Title"]</h2>
+            <p class="form-note" style="text-align:center; margin-bottom:18px;">
+                @if (Auth.IsAuthenticated)
+                {
+                    @Local["Verify.Description", _profile!.Email]
+                }
+                else
+                {
+                    @Local["Verify.DescriptionAnon"]
+                }
+            </p>
 
-                <EditForm Model="_model" OnValidSubmit="ResendAsync" FormName="verify-resend-form">
-                    <DataAnnotationsValidator />
+            @if (_success is not null)
+            {
+                <div class="form-success" role="status">@_success</div>
+            }
+
+            <EditForm Model="_model" OnValidSubmit="SubmitAsync" FormName="verify-code-form">
+                <DataAnnotationsValidator />
+
+                @if (!Auth.IsAuthenticated)
+                {
                     <div class="field">
-                        <label>@Local["Auth.Email"]</label>
-                        <InputText @bind-Value="_model.Email" class="input" type="email" autocomplete="email" />
+                        <label for="verify-email">@Local["Auth.Email"]</label>
+                        <InputText id="verify-email" @bind-Value="_model.Email" class="input" type="email" autocomplete="email" />
                         <ValidationMessage For="() => _model.Email" />
                     </div>
+                }
 
-                    @if (_error is not null)
+                <div class="field">
+                    <label for="verify-code">@Local["Auth.VerificationCode"]</label>
+                    <InputText id="verify-code" @bind-Value="_model.Code" class="input verify-code-input"
+                               inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" />
+                    <ValidationMessage For="() => _model.Code" />
+                </div>
+
+                @if (_error is not null)
+                {
+                    <div class="validation-message" role="alert">@_error</div>
+                }
+
+                <button class="btn btn-primary btn-block" disabled="@_busy" type="submit">
+                    @if (_busy)
                     {
-                        <div class="validation-message" role="alert">@_error</div>
+                        <span class="spinner"></span>
                     }
-                    @if (_success is not null)
-                    {
-                        <div class="form-success" role="status">@_success</div>
-                    }
+                    @Local["Auth.VerifyEmail"]
+                </button>
+            </EditForm>
 
-                    <button class="btn btn-primary btn-block" disabled="@_busy" type="submit">
-                        @if (_busy)
-                        {
-                            <span class="spinner"></span>
-                        }
-                        @Local["Auth.ResendVerification"]
-                    </button>
-                </EditForm>
+            <div class="verify-resend">
+                <ResendCooldownButton @ref="_resend" Label="@Local["Auth.ResendVerification"]" OnResend="ResendAsync" />
+            </div>
 
+            @if (!Auth.IsAuthenticated)
+            {
                 <div class="form-note" style="text-align:center; margin-top:16px;">
                     <a href="/login">@Local["Verify.ContinueToLogin"]</a>
                 </div>
-            </div>
-        }
-        else
-        {
-            <div class="card auth-card">
-                <LoadingIndicator />
-            </div>
-        }
+            }
+        </div>
     }
 </div>
 
 @code {
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> _recentlyVerifiedTokens = new();
-
-    private readonly ResendFormModel _model = new();
-    private string? _token;
-    private bool _verifying;
+    private readonly VerifyCodeForm _model = new();
+    private ResendCooldownButton? _resend;
     private bool _verified;
-    private bool _verifyStarted;
-    private bool _showResendForm;
-    private bool _navigating;
-    private string? _tokenError;
+    private bool _loadingProfile;
     private UserProfile? _profile;
     private string? _error;
     private string? _success;
     private bool _busy;
 
-    private string _ctaKey => Auth.IsAuthenticated ? "Verify.Welcome.CtaStart" : "Auth.Login";
-
     protected override void OnInitialized()
     {
-        _token = ParseToken(Nav.Uri);
-        if (_token is null)
+        if (Auth.IsAuthenticated)
         {
-            if (Auth.IsAuthenticated)
-            {
-                _ = LoadProfileAsync();
-            }
-            else
-            {
-                _showResendForm = true;
-            }
+            _ = LoadProfileAsync();
         }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // The token is single-use, so it must be submitted exactly once.
-        // InteractiveServer + prerendering runs the component twice (a static SSR
-        // pass and the interactive pass, both in the same server process). JS
-        // interop is unavailable during prerendering (InvalidOperationException),
-        // so a successful probe means we're on the interactive pass. The shared
-        // verified-token cache is the second guard: if the prerender pass already
-        // submitted and consumed the token, the interactive pass shows the success
-        // state without re-posting (which would otherwise return 400).
-        if (!firstRender || _verifyStarted || _token is null)
+        // The session may be restored by MainLayout after this page's first
+        // render. Once the user turns out to be authenticated (and possibly
+        // unverified), load the profile lazily so the form can prefill the email.
+        if (Auth.IsAuthenticated && _profile is null && !_loadingProfile)
         {
-            return;
-        }
-
-        try
-        {
-            await JS.InvokeVoidAsync("localStorage.getItem", "bf.verify.guard");
-        }
-        catch (InvalidOperationException)
-        {
-            return; // Prerender pass — the interactive pass will verify.
-        }
-
-        _verifyStarted = true;
-        if (_recentlyVerifiedTokens.TryAdd(_token, true))
-        {
-            await VerifyTokenAsync();
-        }
-        else
-        {
-            _verified = true;
-            StateHasChanged();
-        }
-    }
-
-    private async Task VerifyTokenAsync()
-    {
-        _verifying = true;
-        _tokenError = null;
-        try
-        {
-            await Auth.VerifyEmailAsync(_token!);
-            _verified = true;
-        }
-        catch (Exception ex)
-        {
-            _recentlyVerifiedTokens.TryRemove(_token!, out _);
-            var error = ApiErrorMessage.From(ex);
-            if (error.FieldErrors.Count > 0)
-                _tokenError = string.Join(", ", error.FieldErrors);
-            else if (!string.IsNullOrWhiteSpace(error.Detail))
-                _tokenError = error.Detail;
-            else
-                _tokenError = error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
-        }
-        finally
-        {
-            _verifying = false;
+            await LoadProfileAsync();
         }
     }
 
     private async Task LoadProfileAsync()
     {
-        _profile = await Auth.GetProfileAsync();
+        if (_loadingProfile) return;
+        _loadingProfile = true;
+        try
+        {
+            _profile = await Auth.GetProfileAsync();
+            if (_profile is not null)
+            {
+                _model.Email = _profile.Email;
+            }
+        }
+        finally
+        {
+            _loadingProfile = false;
+            StateHasChanged();
+        }
     }
 
-    private async Task ContinueAsync()
-    {
-        if (_navigating) return;
-        _navigating = true;
-        if (Auth.IsAuthenticated)
-        {
-            await Auth.RefreshProfileAsync();
-            Nav.NavigateTo("/", forceLoad: true);
-        }
-        else
-        {
-            Nav.NavigateTo("/login");
-        }
-    }
-
-    private async Task ResendAsync()
+    private async Task SubmitAsync()
     {
         if (_busy) return;
         _busy = true;
@@ -245,18 +158,18 @@
         _success = null;
         try
         {
-            await Auth.ResendVerificationAsync(_model.Email!.Trim());
-            _success = Local["Verify.Sent"];
+            var email = Auth.IsAuthenticated ? _profile!.Email : _model.Email!.Trim();
+            await Auth.VerifyEmailAsync(email, _model.Code!.Trim());
+            _verified = true;
         }
         catch (Exception ex)
         {
-            var error = ApiErrorMessage.From(ex);
-            if (error.FieldErrors.Count > 0)
-                _error = string.Join(", ", error.FieldErrors);
-            else if (!string.IsNullOrWhiteSpace(error.Detail))
-                _error = error.Detail;
-            else
-                _error = error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+            var message = BuildError(ApiErrorMessage.From(ex));
+            _error = message;
+            if (VerificationCodeErrors.Classify(message) is VerificationCodeFailure.Expired or VerificationCodeFailure.LockedOut)
+            {
+                _model.Code = null;
+            }
         }
         finally
         {
@@ -264,29 +177,53 @@
         }
     }
 
-    private void GoToDashboard() => Nav.NavigateTo("/", forceLoad: true);
-
-    private void ShowResendForm() => _showResendForm = true;
-
-    private static string? ParseToken(string uri)
+    private async Task ResendAsync()
     {
-        var queryIndex = uri.IndexOf('?');
-        if (queryIndex < 0) return null;
-        foreach (var pair in uri[(queryIndex + 1)..].Split('&'))
+        var email = Auth.IsAuthenticated ? _profile?.Email : _model.Email?.Trim();
+        if (string.IsNullOrEmpty(email))
         {
-            var equals = pair.IndexOf('=');
-            if (equals < 0) continue;
-            if (!string.Equals(pair[..equals].Trim(), "token", StringComparison.OrdinalIgnoreCase)) continue;
-            var token = Uri.UnescapeDataString(pair[(equals + 1)..]).Trim();
-            return token.Length > 0 ? token : null;
+            _error = Local["Auth.EnterEmailFirst"];
+            return;
         }
-        return null;
+
+        _error = null;
+        _success = null;
+        try
+        {
+            await Auth.ResendVerificationAsync(email);
+            _success = Local["Verify.Sent"];
+            _resend?.StartCooldown();
+        }
+        catch (Exception ex)
+        {
+            var apiError = ApiErrorMessage.From(ex);
+            _error = BuildError(apiError);
+            if (apiError.StatusCode == 429)
+            {
+                _resend?.StartCooldown();
+            }
+        }
     }
 
-    public sealed class ResendFormModel
+    private void GoToDashboard() => Nav.NavigateTo("/", forceLoad: true);
+
+    private string BuildError(ApiErrorMessage error)
+    {
+        if (error.FieldErrors.Count > 0)
+            return string.Join(", ", error.FieldErrors);
+        if (!string.IsNullOrWhiteSpace(error.Detail))
+            return error.Detail;
+        return error.Title is { } key ? Local[key] : Local["Error.Unexpected"];
+    }
+
+    public sealed class VerifyCodeForm
     {
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email address.")]
         public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Code is required.")]
+        [RegularExpression(@"^[0-9]{6}$", ErrorMessage = "Enter the 6-digit code.")]
+        public string? Code { get; set; }
     }
 }
