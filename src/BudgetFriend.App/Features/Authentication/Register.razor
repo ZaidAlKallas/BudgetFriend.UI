@@ -64,14 +64,6 @@
     private bool _busy;
     private string? _errorMessage;
 
-    protected override void OnInitialized()
-    {
-        if (Auth.IsAuthenticated)
-        {
-            Nav.NavigateTo("/", forceLoad: false);
-        }
-    }
-
     private async Task RegisterAsync()
     {
         if (Model.Password != Model.ConfirmPassword)

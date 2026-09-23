@@ -112,14 +112,6 @@
     private string? _success;
     private bool _busy;
 
-    protected override void OnInitialized()
-    {
-        if (Auth.IsAuthenticated)
-        {
-            _ = LoadProfileAsync();
-        }
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // The session may be restored by MainLayout after this page's first
