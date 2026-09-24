@@ -1,9 +1,10 @@
+@page "/not-found"
 @inherits LocalizedComponentBase
 
 <div class="state" style="padding: 80px 16px;">
-    <span class="tiny muted">404</span>
-    <span>@Local["State.NoResults"]</span>
-    <a class="btn btn-primary" href="/">@Local["Nav.Dashboard"]</a>
+    <span style="font-size: 3rem; font-weight: 700; color: var(--bf-primary);">404</span>
+    <span style="font-size: 1.1rem;">@Local["State.NoResults"]</span>
+    <a class="btn btn-primary" style="font-size: 1.05rem; padding: 13px 26px; border-radius: 12px;" href="/">@Local["Nav.Dashboard"]</a>
 </div>
 
 @layout MainLayout
