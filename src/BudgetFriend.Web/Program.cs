@@ -30,7 +30,8 @@ builder.Services.AddSingleton(apiSettings);
 // HTTP + authentication plumbing.
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<ApiHttpClient>();
-builder.Services.AddScoped<ITokenStore, WebTokenStore>();
+builder.Services.AddSingleton<ServerSessionVault>();
+builder.Services.AddScoped<ITokenStore, HttpOnlyTokenStore>();
 builder.Services.AddScoped<IPreferenceStore, WebPreferenceStore>();
 builder.Services.AddSingleton<ISystemThemeProvider, WebSystemThemeProvider>();
 builder.Services.AddSingleton<IConnectivityService, WebConnectivityService>();
@@ -74,6 +75,41 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
+
+// Session-cookie bridge: the browser manages the opaque httpOnly "bf.session"
+// cookie strictly through these same-origin endpoints, so the access/refresh
+// tokens themselves never reach the browser.
+var sessionCookie = new CookieOptions {
+    HttpOnly = true,
+    SameSite = SameSiteMode.Lax,
+    Secure = !app.Environment.IsDevelopment(),
+    Path = "/",
+};
+
+app.MapGet("/session-bridge", (HttpContext ctx, ServerSessionVault vault) => {
+    if (ctx.Request.Cookies.TryGetValue("bf.session", out var raw) &&
+        Guid.TryParse(raw, out var id) &&
+        vault.TryGet(id) is not null) {
+        return Results.Ok(new { sessionId = id.ToString() });
+    }
+    return Results.Ok(new { sessionId = (string?)null });
+});
+
+app.MapPost("/session-bridge", (BridgeSetRequest req, HttpContext ctx, ServerSessionVault vault) => {
+    if (!Guid.TryParse(req.SessionId, out var id) || !vault.Contains(id)) {
+        return Results.BadRequest();
+    }
+    ctx.Response.Cookies.Append("bf.session", id.ToString(), sessionCookie);
+    return Results.Ok();
+});
+
+app.MapPost("/session-bridge/clear", (HttpContext ctx, ServerSessionVault vault) => {
+    if (ctx.Request.Cookies.TryGetValue("bf.session", out var raw) && Guid.TryParse(raw, out var id)) {
+        vault.Remove(id);
+    }
+    ctx.Response.Cookies.Delete("bf.session", sessionCookie);
+    return Results.Ok();
+});
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

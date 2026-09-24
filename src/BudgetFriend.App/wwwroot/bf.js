@@ -38,6 +38,48 @@ window.bf = (() => {
   const prefersDark = () =>
     window.matchMedia("(prefers-color-scheme: dark)").matches;
 
+  // Session bridge: tokens stay server-side; these helpers manage the opaque
+  // httpOnly "bf.session" cookie through same-origin endpoints.
+  const sessionGet = async () => {
+    try {
+      const resp = await fetch("/session-bridge", {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      return data && data.sessionId ? data.sessionId : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const sessionSet = async (sessionId) => {
+    if (!sessionId) return;
+    try {
+      await fetch("/session-bridge", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
+    } catch {
+      // Non-fatal: the next SetAsync retries.
+    }
+  };
+
+  const sessionClear = async () => {
+    try {
+      await fetch("/session-bridge/clear", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } catch {
+      // Non-fatal.
+    }
+  };
+
   // Sign in with Google (Google Identity Services). Resolves with the Google
   // ID token credential, or null if the flow was dismissed/unavailable.
   const googleSignIn = (clientId) =>
@@ -114,6 +156,9 @@ window.bf = (() => {
     watchSystemTheme,
     watchSystemThemeForNet,
     prefersDark,
+    sessionGet,
+    sessionSet,
+    sessionClear,
     googleSignIn,
     positionPopover,
     initFromAttributes,
