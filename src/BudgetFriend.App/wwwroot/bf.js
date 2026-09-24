@@ -28,10 +28,12 @@ window.bf = (() => {
     return mediaQuery.matches;
   };
 
-  const watchSystemThemeForNet = (dotNetRef, methodName) =>
-    watchSystemTheme((isDark) =>
+  const watchSystemThemeForNet = (dotNetRef, methodName) => {
+    const isDark = watchSystemTheme((isDark) =>
       dotNetRef.invokeMethodAsync(methodName, isDark)
     );
+    dotNetRef.invokeMethodAsync(methodName, isDark);
+  };
 
   const prefersDark = () =>
     window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -98,8 +100,10 @@ window.bf = (() => {
   };
 
   const initFromAttributes = () => {
-    const theme = root().getAttribute("data-bf-theme");
-    if (theme === "dark" || theme === "light") applyTheme(theme === "dark");
+    if (!root().hasAttribute("data-theme")) {
+      const theme = root().getAttribute("data-bf-theme");
+      if (theme === "dark" || theme === "light") applyTheme(theme === "dark");
+    }
     const lang = root().getAttribute("data-bf-lang");
     if (lang) applyLanguage(lang);
   };

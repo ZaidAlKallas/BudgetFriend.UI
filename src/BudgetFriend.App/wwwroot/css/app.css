@@ -4,6 +4,8 @@
    ========================================================================== */
 
 :root {
+  color-scheme: light;
+
   /* Palette */
   --bf-primary: #4f46e5;
   --bf-primary-600: #4338ca;
@@ -39,6 +41,8 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
+
   --bf-bg: #0f1118;
   --bf-surface: #191c27;
   --bf-surface-2: #20242f;

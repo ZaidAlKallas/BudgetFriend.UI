@@ -22,6 +22,7 @@ public interface ISystemThemeProvider {
 public sealed class ThemeService {
     private readonly IPreferenceStore _preferences;
     private readonly ISystemThemeProvider _systemTheme;
+    private bool _systemPrefersDark;
 
     public ThemeService(IPreferenceStore preferences, ISystemThemeProvider systemTheme) {
         _preferences = preferences;
@@ -38,6 +39,7 @@ public sealed class ThemeService {
     public async Task InitializeAsync() {
         var stored = await _preferences.GetAsync(IPreferenceStore.ThemeKey).ConfigureAwait(false);
         SelectedTheme = Parse(stored);
+        _systemPrefersDark = _systemTheme.PrefersDark;
         Resolve();
     }
 
@@ -50,6 +52,7 @@ public sealed class ThemeService {
 
     /// <summary>Called when the OS-level color scheme preference changes.</summary>
     public Task ApplySystemSchemeAsync(bool isDark) {
+        _systemPrefersDark = isDark;
         if (SelectedTheme != AppTheme.System) {
             return Task.CompletedTask;
         }
@@ -68,7 +71,7 @@ public sealed class ThemeService {
     private void Resolve() => IsDark = SelectedTheme switch {
         AppTheme.Light => false,
         AppTheme.Dark => true,
-        _ => _systemTheme.PrefersDark
+        _ => _systemPrefersDark
     };
 
     private void NotifyChanged() => ThemeChanged?.Invoke();
