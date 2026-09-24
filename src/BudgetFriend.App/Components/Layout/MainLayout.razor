@@ -78,6 +78,11 @@ else
             }
 
             await Theme.InitializeAsync();
+            if (Theme.SelectedTheme == AppTheme.System)
+            {
+                var prefersDark = await JS.InvokeAsync<bool>("bf.prefersDark");
+                await Theme.ApplySystemSchemeAsync(prefersDark);
+            }
             await Local.InitializeAsync();
             _self = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("bf.applyTheme", Theme.IsDark);
