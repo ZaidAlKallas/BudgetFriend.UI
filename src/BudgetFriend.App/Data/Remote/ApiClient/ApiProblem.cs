@@ -25,16 +25,24 @@ public sealed class ApiProblem {
         try {
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
+            if (root.ValueKind == JsonValueKind.String) {
+                return new ApiProblem { Detail = root.GetString() };
+            }
+
+            if (root.ValueKind != JsonValueKind.Object) {
+                return null;
+            }
+
             var problem = new ApiProblem {
                 Type = GetString(root, "type"),
                 Title = GetString(root, "title"),
-                Detail = GetString(root, "detail"),
+                Detail = GetString(root, "detail") ?? GetString(root, "message"),
                 Instance = GetString(root, "instance")
             };
 
             if (root.TryGetProperty("status", out var status)) {
                 problem.Status = status.ValueKind switch {
-                    JsonValueKind.Number => status.GetInt32(),
+                    JsonValueKind.Number when status.TryGetInt32(out var statusCode) => statusCode,
                     JsonValueKind.String when int.TryParse(status.GetString(), out var s) => s,
                     _ => 0
                 };

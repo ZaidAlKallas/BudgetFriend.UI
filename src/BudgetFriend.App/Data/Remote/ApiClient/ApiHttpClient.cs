@@ -158,7 +158,7 @@ public sealed class ApiHttpClient {
         }
     }
 
-    private async Task<T> ReadResponseAsync<T>(HttpResponseMessage response, CancellationToken ct) {
+    private static async Task<T> ReadResponseAsync<T>(HttpResponseMessage response, CancellationToken ct) {
         try {
             if (response.IsSuccessStatusCode) {
                 if (response.StatusCode == HttpStatusCode.NoContent) {
