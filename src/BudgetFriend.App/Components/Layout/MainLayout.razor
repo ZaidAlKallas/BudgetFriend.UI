@@ -25,6 +25,7 @@
                         <span class="nav-icon"><SvgIcon Name="logout" Size="20" /></span>
                         <span>@Local["Settings.Logout"]</span>
                     </button>
+                    <LegalLinks Left="true" />
                 </div>
             </div>
         </aside>
@@ -43,7 +44,7 @@ else
 {
     <div class="auth-chrome">
         <TopBar />
-        <div class="auth-shell @(_isSetupPage ? "setup-shell" : "")">
+        <div class="auth-shell @(_isSetupPage ? "setup-shell" : "") @(_isLegalPage ? "legal-shell" : "")">
             @Body
         </div>
     </div>
@@ -52,6 +53,7 @@ else
 @code {
     private bool _isAuthenticated;
     private bool _isSetupPage;
+    private bool _isLegalPage;
     private bool _routing;
     private DotNetObjectReference<MainLayout>? _self;
 
@@ -64,7 +66,18 @@ else
         Local.LanguageChanged += OnChromeChanged;
         Api.SessionExpired += OnSessionExpired;
         Nav.LocationChanged += OnLocationChanged;
+
+        // Seed the chrome from the current URL so the first render is already
+        // correct. HandleRoutingAsync runs on LocationChanged, which does not
+        // fire during static prerendering — without this the legal pages would
+        // be server-rendered inside the narrow, vertically centred auth shell.
+        _isLegalPage = IsLegalPath(Nav.Uri);
     }
+
+    // The legal documents are the only public routes that render long-form
+    // prose, so they get a wider, top-aligned shell instead of the 400px card.
+    private bool IsLegalPath(string uri) =>
+        Nav.ToBaseRelativePath(uri).Trim('/').ToLowerInvariant() is "privacy" or "terms";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -135,6 +148,7 @@ else
         try
         {
             var path = Nav.ToBaseRelativePath(Nav.Uri).Trim('/').ToLowerInvariant();
+            _isLegalPage = IsLegalPath(Nav.Uri);
 
             if (_isAuthenticated)
             {
@@ -147,7 +161,7 @@ else
                 {
                     Nav.NavigateTo(profile?.IsEmailVerified == true ? "/" : "/onboarding");
                 }
-                else if (isKnownUnverified && path is not ("onboarding" or "verify-email"))
+                else if (isKnownUnverified && path is not ("onboarding" or "verify-email") && !_isLegalPage)
                 {
                     Nav.NavigateTo("/verify-email");
                 }

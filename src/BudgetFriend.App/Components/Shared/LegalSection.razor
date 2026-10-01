@@ -1,0 +1,16 @@
+@inherits LocalizedComponentBase
+
+<section class="legal-section">
+    <h2 class="legal-heading">@Title</h2>
+    <div class="legal-body">
+        @ChildContent
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

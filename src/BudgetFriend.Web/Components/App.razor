@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject NavigationManager Nav
+
+<!DOCTYPE html>
 <html lang="en" data-bf-theme="light" data-bf-lang="en">
 
 <head>
@@ -24,9 +26,32 @@
 </head>
 
 <body>
-    <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+    <Routes @rendermode="RouteRenderMode" />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="@Assets["_content/BudgetFriend.App/bf.js"]"></script>
 </body>
 
 </html>
+
+@code {
+    // Prerendering is a whole-response decision: the endpoint renders the tree
+    // statically only when the root render mode says so, which is why this is
+    // chosen per request here rather than with @rendermode on the pages.
+    //
+    // Only the public legal documents are prerendered, so that search engines
+    // and link previews receive their text in the initial HTML. Everything else
+    // stays client-rendered: those routes all require a session, and a
+    // prerendered pass would only emit a shell that the client then throws
+    // away after redirecting to /login.
+    private static readonly IComponentRenderMode Prerendered =
+        new InteractiveServerRenderMode(prerender: true);
+
+    private static readonly IComponentRenderMode ClientOnly =
+        new InteractiveServerRenderMode(prerender: false);
+
+    private IComponentRenderMode RouteRenderMode =>
+        IsLegalPath() ? Prerendered : ClientOnly;
+
+    private bool IsLegalPath() =>
+        Nav.ToBaseRelativePath(Nav.Uri).Trim('/').ToLowerInvariant() is "privacy" or "terms";
+}

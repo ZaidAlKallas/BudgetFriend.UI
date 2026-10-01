@@ -1,0 +1,25 @@
+@inherits LocalizedComponentBase
+
+<div class="legal-doc">
+    <div class="card legal-card">
+        <h1 class="page-title">@Title</h1>
+        <p class="legal-updated">@Local["Legal.Updated", UpdatedOn]</p>
+
+        @ChildContent
+    </div>
+
+    <div class="legal-doc-footer">
+        <LegalLinks />
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public string UpdatedOn { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

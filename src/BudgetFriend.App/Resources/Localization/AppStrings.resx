@@ -90,6 +90,7 @@
   <data name="Auth.HasAccount" xml:space="preserve"><value>Already have an account?</value></data>
   <data name="Auth.LoginTitle" xml:space="preserve"><value>Welcome back</value></data>
   <data name="Auth.RegisterTitle" xml:space="preserve"><value>Create your account</value></data>
+  <data name="Auth.LegalConsent" xml:space="preserve"><value>By creating an account you agree to our</value></data>
 
   <!-- Actions -->
   <data name="Action.Save" xml:space="preserve"><value>Save</value></data>
@@ -197,6 +198,7 @@
   <data name="Settings.Logout" xml:space="preserve"><value>Log Out</value></data>
   <data name="Settings.Verified" xml:space="preserve"><value>Verified</value></data>
   <data name="Settings.NotVerified" xml:space="preserve"><value>Not verified</value></data>
+  <data name="Settings.About.Description" xml:space="preserve"><value>Cross-platform personal finance manager. Web is online-first; the mobile app keeps your data locally on the device.</value></data>
 
   <!-- Common -->
   <data name="Common.Confirm" xml:space="preserve"><value>Are you sure?</value></data>
@@ -295,4 +297,96 @@
   <data name="Reset.Code.Description" xml:space="preserve"><value>Enter the 6-digit code we sent to {0}. It expires in 15 minutes.</value></data>
   <data name="Reset.CodeResent" xml:space="preserve"><value>A new password reset code has been sent.</value></data>
   <data name="Reset.Done.Message" xml:space="preserve"><value>Your password has been reset. Please sign in with your new password.</value></data>
+
+  <!-- Legal -->
+  <data name="Legal.Updated" xml:space="preserve"><value>Last updated: {0}</value></data>
+  <data name="Legal.UpdatedOn" xml:space="preserve"><value>1 October 2026</value></data>
+  <data name="Legal.Nav.Privacy" xml:space="preserve"><value>Privacy Policy</value></data>
+  <data name="Legal.Nav.Terms" xml:space="preserve"><value>Terms of Service</value></data>
+  <data name="Legal.Contact.Title" xml:space="preserve"><value>Contact</value></data>
+
+  <!-- Legal / Privacy policy -->
+  <data name="Legal.Privacy.Title" xml:space="preserve"><value>Privacy Policy</value></data>
+  <data name="Legal.Privacy.Intro" xml:space="preserve"><value>BudgetFriend is a personal finance manager for tracking accounts, transactions, transfers and categories. This policy explains what information the app handles, why it handles it, and the choices you have. BudgetFriend does not sell your personal information and does not share it for advertising.</value></data>
+  <data name="Legal.Privacy.Collect.Title" xml:space="preserve"><value>Information we collect</value></data>
+  <data name="Legal.Privacy.Collect.Account" xml:space="preserve"><value>Account information — the email address, first name and last name you provide at registration, plus a hash of your password. We also record whether your address has been verified and when the account was created.</value></data>
+  <data name="Legal.Privacy.Collect.Financial" xml:space="preserve"><value>Financial information — the accounts, categories, transactions and transfers you enter, together with their amounts, currencies and dates. This is the content of your workspace.</value></data>
+  <data name="Legal.Privacy.Collect.Technical" xml:space="preserve"><value>Technical information — an opaque session identifier kept in an httpOnly cookie named “bf.session”; your theme and language preferences kept in your browser's local storage; and request logs such as IP address and timestamp kept by the web server for security and troubleshooting.</value></data>
+  <data name="Legal.Privacy.Collect.NotCollected" xml:space="preserve"><value>We do not ask for payment card numbers, bank credentials or government identifiers, and we do not run advertising or cross-site tracking.</value></data>
+  <data name="Legal.Privacy.Use.Title" xml:space="preserve"><value>How we use your information</value></data>
+  <data name="Legal.Privacy.Use.P1" xml:space="preserve"><value>To run your account: sign-in, email verification, password reset and session management.</value></data>
+  <data name="Legal.Privacy.Use.P2" xml:space="preserve"><value>To store your financial records and sync them across the devices you use BudgetFriend on.</value></data>
+  <data name="Legal.Privacy.Use.P3" xml:space="preserve"><value>To display the language and theme you have chosen.</value></data>
+  <data name="Legal.Privacy.Use.P4" xml:space="preserve"><value>To detect and prevent abuse, such as repeated failed sign-in attempts.</value></data>
+  <data name="Legal.Privacy.Use.P5" xml:space="preserve"><value>To diagnose faults and answer support requests.</value></data>
+  <data name="Legal.Privacy.Sharing.Title" xml:space="preserve"><value>How we share your information</value></data>
+  <data name="Legal.Privacy.Sharing.P1" xml:space="preserve"><value>We do not sell your personal information.</value></data>
+  <data name="Legal.Privacy.Sharing.P2" xml:space="preserve"><value>We share it with the hosting providers that run the application server and database, which process it only on our instructions.</value></data>
+  <data name="Legal.Privacy.Sharing.P3" xml:space="preserve"><value>We disclose it only where the law requires it — for example in response to a valid legal process, or to protect the rights and safety of users.</value></data>
+  <data name="Legal.Privacy.Sharing.P4" xml:space="preserve"><value>If the project is transferred to a new owner, we will tell you in advance so you can export or delete your data first.</value></data>
+  <data name="Legal.Privacy.Storage.Title" xml:space="preserve"><value>Where your data is stored</value></data>
+  <data name="Legal.Privacy.Storage.P1" xml:space="preserve"><value>The web version is online-first: your financial records live on the server running BudgetFriend and reach your browser over an encrypted connection.</value></data>
+  <data name="Legal.Privacy.Storage.P2" xml:space="preserve"><value>The mobile version keeps your data in local storage on the device and synchronises it with that same server when you are online.</value></data>
+  <data name="Legal.Privacy.Storage.P3" xml:space="preserve"><value>If you run your own copy, all of this data stays on infrastructure you control.</value></data>
+  <data name="Legal.Privacy.Security.Title" xml:space="preserve"><value>Security</value></data>
+  <data name="Legal.Privacy.Security.P1" xml:space="preserve"><value>Passwords are stored only as salted hashes. The plain password is never written to disk or to logs.</value></data>
+  <data name="Legal.Privacy.Security.P2" xml:space="preserve"><value>Session tokens are held on the server and referenced by an httpOnly, Secure, SameSite cookie, so page scripts cannot read them.</value></data>
+  <data name="Legal.Privacy.Security.P3" xml:space="preserve"><value>Connections to the web version are encrypted with HTTPS.</value></data>
+  <data name="Legal.Privacy.Security.P4" xml:space="preserve"><value>No method of protection is perfect. If you think your account has been compromised, change your password from the sign-in screen and contact us.</value></data>
+  <data name="Legal.Privacy.Retention.Title" xml:space="preserve"><value>How long we keep your information</value></data>
+  <data name="Legal.Privacy.Retention.P1" xml:space="preserve"><value>While your account is active, we keep what is needed to run your workspace.</value></data>
+  <data name="Legal.Privacy.Retention.P2" xml:space="preserve"><value>Verification and password-reset codes expire after 15 minutes.</value></data>
+  <data name="Legal.Privacy.Retention.P3" xml:space="preserve"><value>When you delete your account, your financial records are removed from the application database. Copies may remain in backups until the hosting provider's normal rotation replaces them.</value></data>
+  <data name="Legal.Privacy.Retention.P4" xml:space="preserve"><value>Request logs are kept for a limited period for security purposes.</value></data>
+  <data name="Legal.Privacy.Rights.Title" xml:space="preserve"><value>Your choices and rights</value></data>
+  <data name="Legal.Privacy.Rights.P1" xml:space="preserve"><value>Access and export — your data is yours, so export it from the app whenever you like.</value></data>
+  <data name="Legal.Privacy.Rights.P2" xml:space="preserve"><value>Correction — edit accounts, transactions and categories directly, and update your name from Settings.</value></data>
+  <data name="Legal.Privacy.Rights.P3" xml:space="preserve"><value>Deletion — delete your account to have your data removed.</value></data>
+  <data name="Legal.Privacy.Rights.P4" xml:space="preserve"><value>Objection and withdrawal — contact us to object to processing, or to withdraw consent where processing relies on consent.</value></data>
+  <data name="Legal.Privacy.Rights.Extra" xml:space="preserve"><value>Depending on where you live you may also have rights such as data portability, the right to restrict processing, and the right to complain to a supervisory authority. Where a self-hosted operator is the controller of your data, send those requests to them.</value></data>
+  <data name="Legal.Privacy.Children.Title" xml:space="preserve"><value>Children</value></data>
+  <data name="Legal.Privacy.Children.Body" xml:space="preserve"><value>BudgetFriend is not directed at children under 13, or under the minimum age of consent in your country, and we do not knowingly collect personal information from them.</value></data>
+  <data name="Legal.Privacy.Changes.Title" xml:space="preserve"><value>Changes to this policy</value></data>
+  <data name="Legal.Privacy.Changes.Body" xml:space="preserve"><value>We may update this policy as the app changes. The date at the top always reflects the current version, and for material changes we will announce them in the app before they take effect.</value></data>
+  <data name="Legal.Privacy.Contact" xml:space="preserve"><value>Questions about this policy? Write to us at support@budgetfriend.zaidalkallas.me.</value></data>
+
+  <!-- Legal / Terms of service -->
+  <data name="Legal.Terms.Title" xml:space="preserve"><value>Terms of Service</value></data>
+  <data name="Legal.Terms.Intro" xml:space="preserve"><value>These Terms of Service govern your use of BudgetFriend, the personal finance application published under the MIT licence. By creating an account or using the app you agree to them. If you do not agree, please do not use the app.</value></data>
+  <data name="Legal.Terms.Accept.Title" xml:space="preserve"><value>Acceptance</value></data>
+  <data name="Legal.Terms.Accept.P1" xml:space="preserve"><value>You must be legally able to enter into a binding contract in your jurisdiction to use the app.</value></data>
+  <data name="Legal.Terms.Accept.P2" xml:space="preserve"><value>If you use BudgetFriend on behalf of an organisation, you confirm that you have authority to bind that organisation, and that “organisation” includes companies, partnerships and non-profits.</value></data>
+  <data name="Legal.Terms.Account.Title" xml:space="preserve"><value>Your account</value></data>
+  <data name="Legal.Terms.Account.P1" xml:space="preserve"><value>Give accurate registration details and keep them up to date.</value></data>
+  <data name="Legal.Terms.Account.P2" xml:space="preserve"><value>You are responsible for activity under your account and for keeping your credentials and session confidential. Tell us promptly if you suspect unauthorised access.</value></data>
+  <data name="Legal.Terms.Account.P3" xml:space="preserve"><value>One account per person unless we agree otherwise. Accounts are not transferable.</value></data>
+  <data name="Legal.Terms.Use.Title" xml:space="preserve"><value>Acceptable use</value></data>
+  <data name="Legal.Terms.Use.P1" xml:space="preserve"><value>Use the app only for lawful purposes, and not to plan or carry out fraud, money laundering or tax evasion.</value></data>
+  <data name="Legal.Terms.Use.P2" xml:space="preserve"><value>Do not attempt to reach the server, another account or any connected system without authorisation, and do not probe, overload or disrupt the service.</value></data>
+  <data name="Legal.Terms.Use.P3" xml:space="preserve"><value>Do not copy, resell, sublicense or create derivative works of the app beyond what the MIT licence allows, and do not remove attribution from the source.</value></data>
+  <data name="Legal.Terms.Use.P4" xml:space="preserve"><value>Do not reverse engineer the app or attempt to extract its source code, except to the extent that restriction is prohibited by law.</value></data>
+  <data name="Legal.Terms.Use.P5" xml:space="preserve"><value>Do not publish your workspace content in a way that infringes someone else's rights.</value></data>
+  <data name="Legal.Terms.Content.Title" xml:space="preserve"><value>Your content, and your responsibilities</value></data>
+  <data name="Legal.Terms.Content.P1" xml:space="preserve"><value>Your accounts, categories, transactions and transfers remain yours. We claim no ownership of them.</value></data>
+  <data name="Legal.Terms.Content.P2" xml:space="preserve"><value>BudgetFriend is a record-keeping tool. It does not connect to your bank and it does not provide financial, tax or legal advice. Reconcile your records against your statements and seek professional advice where it matters — we are not liable for decisions made on the basis of data you enter.</value></data>
+  <data name="Legal.Terms.Content.P3" xml:space="preserve"><value>Keep your own backups of anything you cannot afford to lose.</value></data>
+  <data name="Legal.Terms.Availability.Title" xml:space="preserve"><value>Availability and changes to the service</value></data>
+  <data name="Legal.Terms.Availability.P1" xml:space="preserve"><value>We aim to keep the service available but do not promise that it will be uninterrupted or error-free.</value></data>
+  <data name="Legal.Terms.Availability.P2" xml:space="preserve"><value>Features may be added, changed or removed between versions. We may change or discontinue any part of the service on reasonable notice, and will give you time to export your data before a change removes the means to export it.</value></data>
+  <data name="Legal.Terms.Availability.P3" xml:space="preserve"><value>The app is published in source form under the MIT licence, so you are free to run your own copy.</value></data>
+  <data name="Legal.Terms.Ip.Title" xml:space="preserve"><value>Intellectual property</value></data>
+  <data name="Legal.Terms.Ip.Body" xml:space="preserve"><value>BudgetFriend and its name and logo belong to the project. The underlying software is licensed under the MIT licence, which permits use, modification and distribution provided the copyright notice is kept. These Terms do not narrow any right that licence gives you.</value></data>
+  <data name="Legal.Terms.Disclaimer.Title" xml:space="preserve"><value>Disclaimer</value></data>
+  <data name="Legal.Terms.Disclaimer.Body" xml:space="preserve"><value>To the fullest extent the law allows, the app is provided “as is” and “as available”, without warranties of any kind, whether express or implied, including merchantability, fitness for a particular purpose, accuracy and non-infringement. We do not warrant that calculations, categorisation or balances will suit your purposes.</value></data>
+  <data name="Legal.Terms.Liability.Title" xml:space="preserve"><value>Limitation of liability</value></data>
+  <data name="Legal.Terms.Liability.Body" xml:space="preserve"><value>To the fullest extent the law allows, the project and its contributors are not liable for indirect, incidental, special or consequential damages, nor for lost profits or lost data, arising from your use of the app. Where liability cannot be excluded it is limited to the greater of the amount you paid for the app — which is zero — and the minimum allowed by law. Some jurisdictions do not permit certain exclusions, so parts of this section may not apply to you.</value></data>
+  <data name="Legal.Terms.Termination.Title" xml:space="preserve"><value>Ending the agreement</value></data>
+  <data name="Legal.Terms.Termination.P1" xml:space="preserve"><value>You may stop using the app and delete your account at any time.</value></data>
+  <data name="Legal.Terms.Termination.P2" xml:space="preserve"><value>We may suspend or close an account that breaches these Terms, has been inactive for a long period, or where we are required to do so by law. Where it is practical we will tell you first.</value></data>
+  <data name="Legal.Terms.Termination.P3" xml:space="preserve"><value>When this agreement ends your right to use the hosted app ends. The MIT licence still lets you keep using any copy of the software you already have.</value></data>
+  <data name="Legal.Terms.Changes.Title" xml:space="preserve"><value>Changes to these Terms</value></data>
+  <data name="Legal.Terms.Changes.Body" xml:space="preserve"><value>We may revise these Terms. The revised version takes effect when posted, and material changes are announced in the app. Continuing to use BudgetFriend after that date means you accept the revised Terms.</value></data>
+  <data name="Legal.Terms.Governing.Title" xml:space="preserve"><value>Governing law</value></data>
+  <data name="Legal.Terms.Governing.Body" xml:space="preserve"><value>These Terms are governed by the laws that apply where the project maintainer publishes the app, without regard to conflict-of-laws rules. If any provision is found unenforceable, the rest stays in force. Nothing here limits rights you have under mandatory consumer law.</value></data>
+  <data name="Legal.Terms.Contact" xml:space="preserve"><value>Questions about these Terms? Write to us at support@budgetfriend.zaidalkallas.me.</value></data>
 </root>

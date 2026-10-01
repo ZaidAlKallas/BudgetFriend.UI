@@ -1659,6 +1659,94 @@ table.data tbody tr:hover {
   50% { opacity: 0.35; }
 }
 
+/* ==========================================================================
+   Legal documents (privacy policy, terms of service)
+   ========================================================================== */
+
+/* Legal pages are long, so they start at the top of the viewport instead of
+   being vertically centred like the auth cards, and use a reading width. */
+.legal-shell {
+  place-items: start center;
+}
+
+.legal-doc {
+  width: 100%;
+  max-width: 760px;
+}
+
+.legal-card {
+  padding: 28px;
+}
+
+.legal-updated {
+  color: var(--bf-text-3);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.legal-section {
+  margin-top: 28px;
+}
+
+.legal-section:first-of-type {
+  margin-top: 24px;
+}
+
+.legal-heading {
+  font-size: 1rem;
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+
+.legal-body {
+  color: var(--bf-text-2);
+  line-height: 1.65;
+  font-size: 0.92rem;
+}
+
+.legal-body p + p {
+  margin-top: 10px;
+}
+
+.legal-body ul {
+  margin: 10px 0 0;
+  padding-inline-start: 20px;
+}
+
+.legal-body li + li {
+  margin-top: 6px;
+}
+
+/* Footer links shared by the legal pages, settings and the auth screens. */
+.legal-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+  font-size: 0.85rem;
+}
+
+.legal-links-left {
+  justify-content: flex-start;
+}
+
+.legal-links a {
+  color: var(--bf-text-2);
+  font-weight: 600;
+}
+
+.legal-doc-footer {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bf-border);
+}
+
+.legal-doc-footer .legal-links {
+  margin-top: 0;
+}
+
 @media print {
   .sidebar, .bottom-nav, .page-actions { display: none !important; }
 }

@@ -57,6 +57,12 @@
         @Local["Auth.HasAccount"]
         <a href="/login">@Local["Auth.Login"]</a>
     </div>
+
+    <div class="form-note" style="text-align:center; margin-top:6px;">
+        @Local["Auth.LegalConsent"]
+        <a href="/terms">@Local["Legal.Nav.Terms"]</a> ·
+        <a href="/privacy">@Local["Legal.Nav.Privacy"]</a>
+    </div>
 </div>
 
 @code {

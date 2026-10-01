@@ -1,0 +1,11 @@
+@inherits LocalizedComponentBase
+
+<div class="legal-links @(Left ? "legal-links-left" : "")">
+    <a href="/privacy">@Local["Legal.Nav.Privacy"]</a>
+    <a href="/terms">@Local["Legal.Nav.Terms"]</a>
+</div>
+
+@code {
+    [Parameter]
+    public bool Left { get; set; }
+}

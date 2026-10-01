@@ -90,6 +90,7 @@
   <data name="Auth.HasAccount" xml:space="preserve"><value>لديك حساب بالفعل؟</value></data>
   <data name="Auth.LoginTitle" xml:space="preserve"><value>مرحبًا بعودتك</value></data>
   <data name="Auth.RegisterTitle" xml:space="preserve"><value>إنشاء حسابك</value></data>
+  <data name="Auth.LegalConsent" xml:space="preserve"><value>بانشائك حسابًا فإنك توافق على</value></data>
 
   <!-- Actions -->
   <data name="Action.Save" xml:space="preserve"><value>حفظ</value></data>
@@ -197,6 +198,7 @@
   <data name="Settings.Logout" xml:space="preserve"><value>تسجيل الخروج</value></data>
   <data name="Settings.Verified" xml:space="preserve"><value>موثق</value></data>
   <data name="Settings.NotVerified" xml:space="preserve"><value>غير موثق</value></data>
+  <data name="Settings.About.Description" xml:space="preserve"><value>مدير مالية شخصي متعدد المنصات. تعمل نسخة الويب بشكل متصل، بينما يحتفظ تطبيق الهاتف ببياناتك محليًا على الجهاز.</value></data>
 
   <!-- Common -->
   <data name="Common.Confirm" xml:space="preserve"><value>هل أنت متأكد؟</value></data>
@@ -295,4 +297,96 @@
   <data name="Reset.Code.Description" xml:space="preserve"><value>أدخل الرمز المكوَّن من 6 أرقام الذي أرسلناه إلى {0}. الرمز صالح لمدة 15 دقيقة.</value></data>
   <data name="Reset.CodeResent" xml:space="preserve"><value>تم إرسال رمز جديد لإعادة تعيين كلمة المرور.</value></data>
   <data name="Reset.Done.Message" xml:space="preserve"><value>تمت إعادة تعيين كلمة مرورك. يرجى تسجيل الدخول بكلمة المرور الجديدة.</value></data>
+
+  <!-- Legal -->
+  <data name="Legal.Updated" xml:space="preserve"><value>آخر تحديث: {0}</value></data>
+  <data name="Legal.UpdatedOn" xml:space="preserve"><value>١ أكتوبر ٢٠٢٦</value></data>
+  <data name="Legal.Nav.Privacy" xml:space="preserve"><value>سياسة الخصوصية</value></data>
+  <data name="Legal.Nav.Terms" xml:space="preserve"><value>شروط الخدمة</value></data>
+  <data name="Legal.Contact.Title" xml:space="preserve"><value>التواصل</value></data>
+
+  <!-- Legal / Privacy policy -->
+  <data name="Legal.Privacy.Title" xml:space="preserve"><value>سياسة الخصوصية</value></data>
+  <data name="Legal.Privacy.Intro" xml:space="preserve"><value>‏BudgetFriend تطبيق لإدارة المالية الشخصية يتابع الحسابات والمعاملات والتحويلات والفئات. توضّح هذه السياسة المعلومات التي يعالجها التطبيق، ولماذا يعالجها، والخيارات المتاحة لك. لا يبيع BudgetFriend بياناتك الشخصية ولا يشاركها لأغراض إعلانية.</value></data>
+  <data name="Legal.Privacy.Collect.Title" xml:space="preserve"><value>المعلومات التي نجمعها</value></data>
+  <data name="Legal.Privacy.Collect.Account" xml:space="preserve"><value>معلومات الحساب — البريد الإلكتروني والاسم الأول واسم العائلة التي تقدّمها عند التسجيل، إضافةً إلى بصمة (hash) لكلمة المرور. نسجّل أيضًا ما إذا كان عنوانك موثّقًا ومتى أُنشئ الحساب.</value></data>
+  <data name="Legal.Privacy.Collect.Financial" xml:space="preserve"><value>المعلومات المالية — الحسابات والفئات والمعاملات والتحويلات التي تُدخلها، مع مبالغها وعملاتها وتواريخها. وهذا هو محتوى مساحة عملك.</value></data>
+  <data name="Legal.Privacy.Collect.Technical" xml:space="preserve"><value>المعلومات التقنية — مُعرّف جلسة معتم يُحفظ في ملف تعريف ارتباط (cookie) من نوع httpOnly باسم «bf.session»؛ وتفضيلات السمة واللغة المحفوظة في التخزين المحلي للمتصفح؛ وسجلات الطلبات مثل عنوان IP والطابع الزمني التي يحتفظ بها خادم الويب لأغراض الأمان وتشخيص الأعطال.</value></data>
+  <data name="Legal.Privacy.Collect.NotCollected" xml:space="preserve"><value>لا نطلب أرقام بطاقات الدفع أو بيانات اعتماد البنك أو مُعرّفات حكومية، ولا نستخدم إعلانات أو تتبّعًا عبر المواقع.</value></data>
+  <data name="Legal.Privacy.Use.Title" xml:space="preserve"><value>كيف نستخدم معلوماتك</value></data>
+  <data name="Legal.Privacy.Use.P1" xml:space="preserve"><value>لتشغيل حسابك: تسجيل الدخول وتوثيق البريد الإلكتروني وإعادة تعيين كلمة المرور وإدارة الجلسات.</value></data>
+  <data name="Legal.Privacy.Use.P2" xml:space="preserve"><value>لتخزين سجلاتك المالية ومزامنتها عبر الأجهزة التي تستخدم BudgetFriend عليها.</value></data>
+  <data name="Legal.Privacy.Use.P3" xml:space="preserve"><value>لعرض اللغة والسمة التي اخترتهما.</value></data>
+  <data name="Legal.Privacy.Use.P4" xml:space="preserve"><value>لكشف إساءة الاستخدام ومنعها، مثل محاولات تسجيل الدخول الفاشلة المتكررة.</value></data>
+  <data name="Legal.Privacy.Use.P5" xml:space="preserve"><value>لتشخيص الأعطال والرد على طلبات الدعم.</value></data>
+  <data name="Legal.Privacy.Sharing.Title" xml:space="preserve"><value>كيف نشارك معلوماتك</value></data>
+  <data name="Legal.Privacy.Sharing.P1" xml:space="preserve"><value>لا نبيع معلوماتك الشخصية.</value></data>
+  <data name="Legal.Privacy.Sharing.P2" xml:space="preserve"><value>نشاركها مع مزوّدي الاستضافة الذين يشغّلون خادم التطبيق وقاعدة البيانات، والذين يعالجونها وفق تعليماتنا فقط.</value></data>
+  <data name="Legal.Privacy.Sharing.P3" xml:space="preserve"><value>لا نفصح عنها إلا حيث يقتضي القانون — مثلًا استجابةً لإجراء قانوني ساري، أو لحماية حقوق المستخدمين وسلامتهم.</value></data>
+  <data name="Legal.Privacy.Sharing.P4" xml:space="preserve"><value>إذا انتقل المشروع إلى مالك جديد، سنُعلمك مسبقًا لتتمكّن من تصدير بياناتك أو حذفها أولًا.</value></data>
+  <data name="Legal.Privacy.Storage.Title" xml:space="preserve"><value>أين تُخزَّن بياناتك</value></data>
+  <data name="Legal.Privacy.Storage.P1" xml:space="preserve"><value>النسخة على الويب تعمل بشكل متصل: تُحفظ سجلاتك المالية على الخادم الذي يشغّل BudgetFriend وتصل إلى متصفحك عبر اتصال مشفّر.</value></data>
+  <data name="Legal.Privacy.Storage.P2" xml:space="preserve"><value>تحتفظ نسخة الهاتف ببياناتك في التخزين المحلي على الجهاز وتزامنها مع الخادم نفسه عندما تكون متصلًا بالإنترنت.</value></data>
+  <data name="Legal.Privacy.Storage.P3" xml:space="preserve"><value>إذا كنت تشغّل نسختك الخاصة، فتبقى جميع هذه البيانات على البنية التحتية التي تتحكم بها.</value></data>
+  <data name="Legal.Privacy.Security.Title" xml:space="preserve"><value>الأمان</value></data>
+  <data name="Legal.Privacy.Security.P1" xml:space="preserve"><value>تُخزَّن كلمات المرور كبصمات مملَّحة فقط. لا تُكتب كلمة المرور الأصلية على القرص ولا في السجلات.</value></data>
+  <data name="Legal.Privacy.Security.P2" xml:space="preserve"><value>تُحفظ رموز الجلسة على الخادم ويشير إليها ملف تعريف ارتباط من نوع httpOnly وSecure وSameSite، لذا لا تستطيع سكربتات الصفحة قراءتها.</value></data>
+  <data name="Legal.Privacy.Security.P3" xml:space="preserve"><value>تُشفَّر الاتصالات بالنسخة على الويب باستخدام HTTPS.</value></data>
+  <data name="Legal.Privacy.Security.P4" xml:space="preserve"><value>لا توجد وسيلة حماية تامة. إذا رأيت أن حسابك مخترَق، فغيّر كلمة المرور من شاشة تسجيل الدخول وتواصل معنا.</value></data>
+  <data name="Legal.Privacy.Retention.Title" xml:space="preserve"><value>مدة الاحتفاظ بمعلوماتك</value></data>
+  <data name="Legal.Privacy.Retention.P1" xml:space="preserve"><value>طالما كان حسابك نشطًا، نحتفظ بما يلزم لتشغيل مساحة عملك.</value></data>
+  <data name="Legal.Privacy.Retention.P2" xml:space="preserve"><value>تنتهي صلاحية رموز توثيق البريد الإلكتروني وإعادة تعيين كلمة المرور بعد 15 دقيقة.</value></data>
+  <data name="Legal.Privacy.Retention.P3" xml:space="preserve"><value>عند حذفك حسابك، تُحذف سجلاتك المالية من قاعدة بيانات التطبيق. وقد تبقى نسخ في النسخ الاحتياطية حتى تستبدلها دورة التدوير الاعتيادية لدى مزوّد الاستضافة.</value></data>
+  <data name="Legal.Privacy.Retention.P4" xml:space="preserve"><value>تُحفظ سجلات الطلبات لفترة محدودة لأغراض أمنية.</value></data>
+  <data name="Legal.Privacy.Rights.Title" xml:space="preserve"><value>خياراتك وحقوقك</value></data>
+  <data name="Legal.Privacy.Rights.P1" xml:space="preserve"><value>الوصول والتصدير — بياناتك ملكك، فصدّرها من التطبيق متى شئت.</value></data>
+  <data name="Legal.Privacy.Rights.P2" xml:space="preserve"><value>التصحيح — عدّل الحسابات والمعاملات والفئات مباشرة، وحدّث اسمك من الإعدادات.</value></data>
+  <data name="Legal.Privacy.Rights.P3" xml:space="preserve"><value>الحذف — احذف حسابك ليتم حذف بياناتك.</value></data>
+  <data name="Legal.Privacy.Rights.P4" xml:space="preserve"><value>الاعتراض والسحب — تواصل معنا للاعتراض على المعالجة، أو لسحب الموافقة حيث تقوم المعالجة على الموافقة.</value></data>
+  <data name="Legal.Privacy.Rights.Extra" xml:space="preserve"><value>قد تتمتع، تبعًا لمكان إقامتك، بحقوق إضافية مثل قابلية نقل البيانات والحق في تقييد المعالجة والحق في تقديم شكوى إلى جهة رقابية. وإذا كان مشغّل نسخة خاصة هو المتحكم في بياناتك، فوجّه تلك الطلبات إليه.</value></data>
+  <data name="Legal.Privacy.Children.Title" xml:space="preserve"><value>الأطفال</value></data>
+  <data name="Legal.Privacy.Children.Body" xml:space="preserve"><value>‏BudgetFriend غير موجَّه للأطفال دون سن الثالثة عشرة، أو دون الحد الأدنى لسن الرضا في بلدك، ولا نجمع المعلومات الشخصية منهم عن علم.</value></data>
+  <data name="Legal.Privacy.Changes.Title" xml:space="preserve"><value>التغييرات على هذه السياسة</value></data>
+  <data name="Legal.Privacy.Changes.Body" xml:space="preserve"><value>قد نحدّث هذه السياسة مع تغيّر التطبيق. يعكس التاريخ في الأعلى دائمًا النسخة الحالية، وفي التغييرات الجوهرية سنعلن عنها داخل التطبيق قبل سريانها.</value></data>
+  <data name="Legal.Privacy.Contact" xml:space="preserve"><value>لديك أسئلة حول هذه السياسة؟ راسلنا على support@budgetfriend.zaidalkallas.me.</value></data>
+
+  <!-- Legal / Terms of service -->
+  <data name="Legal.Terms.Title" xml:space="preserve"><value>شروط الخدمة</value></data>
+  <data name="Legal.Terms.Intro" xml:space="preserve"><value>تحكم شروط الخدمة هذه استخدامك لـ BudgetFriend، تطبيق إدارة المالية الشخصية المنشور برخصة MIT. بإنشائك حسابًا أو باستخدام التطبيق فإنك توافق عليها. وإذا لم توافق عليها، فيرجى عدم استخدام التطبيق.</value></data>
+  <data name="Legal.Terms.Accept.Title" xml:space="preserve"><value>قبول الشروط</value></data>
+  <data name="Legal.Terms.Accept.P1" xml:space="preserve"><value>يجب أن تكون قادرًا قانونيًا على إبرام عقد ملزم في نطاقك القضائي لاستخدام التطبيق.</value></data>
+  <data name="Legal.Terms.Accept.P2" xml:space="preserve"><value>إذا استخدمت BudgetFriend نيابةً عن جهة، فإنك تقرّ بأن لديك صلاحية إلزام تلك الجهة، وأن «الجهة» تشمل الشركات والشرطات والمنظمات غير الربحية.</value></data>
+  <data name="Legal.Terms.Account.Title" xml:space="preserve"><value>حسابك</value></data>
+  <data name="Legal.Terms.Account.P1" xml:space="preserve"><value>قدّم بيانات تسجيل دقيقة وحدّثها باستمرار.</value></data>
+  <data name="Legal.Terms.Account.P2" xml:space="preserve"><value>أنت مسؤول عن النشاط الذي يجري تحت حسابك وعن الحفاظ على سرية بيانات دخولك وجلسةك. أبلغنا فورًا إذا اشتبهت في وصول غير مصرّح به.</value></data>
+  <data name="Legal.Terms.Account.P3" xml:space="preserve"><value>حساب واحد لكل شخص ما لم نتفق على خلاف ذلك. الحسابات غير قابلة للتنازل.</value></data>
+  <data name="Legal.Terms.Use.Title" xml:space="preserve"><value>الاستخدام المقبول</value></data>
+  <data name="Legal.Terms.Use.P1" xml:space="preserve"><value>استخدم التطبيق لأغراض مشروعة فقط، لا للتخطيط أو تنفيذ الاحتيال أو غسل الأموال أو التهرب الضريبي.</value></data>
+  <data name="Legal.Terms.Use.P2" xml:space="preserve"><value>لا تحاول الوصول إلى الخادم أو حساب آخر أو أي نظام متصل دون تصريح، ولا تختبر الخدمة أو تحمّلها أو تعطّلها.</value></data>
+  <data name="Legal.Terms.Use.P3" xml:space="preserve"><value>لا تنسخ التطبيق أو تُعيد بيعه أو ترخّص من الخطط المشتقة منه بما يتجاوز ما تسمح به رخصة MIT، ولا تحذف نسب المصنف من الشيفرة المصدرية.</value></data>
+  <data name="Legal.Terms.Use.P4" xml:space="preserve"><value>لا تنفّذ الهندسة العكسية للتطبيق أو تحاول استخراج شيفرته المصدرية، إلا في الحدود التي يحظر القانون فيها هذا التقييد.</value></data>
+  <data name="Legal.Terms.Use.P5" xml:space="preserve"><value>لا تنشر محتوى مساحة عملك بطريقة تنتهك حقوق الآخرين.</value></data>
+  <data name="Legal.Terms.Content.Title" xml:space="preserve"><value>محتواك ومسؤولياتك</value></data>
+  <data name="Legal.Terms.Content.P1" xml:space="preserve"><value>حساباتك وفئاتك ومعاملاتك وتحويلاتك تبقى ملكًا لك. ولا ندّعي ملكيتها.</value></data>
+  <data name="Legal.Terms.Content.P2" xml:space="preserve"><value>‏BudgetFriend أداة لتدوين السجلات. لا يتصل ببنكك ولا يقدّم مشورة مالية أو ضريبية أو قانونية. طابِق سجلاتك مع كشوف حسابك واستعن بخبير متخصص حيثما يلزم — ونحن غير مسؤولين عن القرارات المبنية على البيانات التي تُدخلها.</value></data>
+  <data name="Legal.Terms.Content.P3" xml:space="preserve"><value>احتفظ بنسخك الاحتياطية الخاصة من كل ما لا تحتمل خسارته.</value></data>
+  <data name="Legal.Terms.Availability.Title" xml:space="preserve"><value>توافر الخدمة وتغييراتها</value></data>
+  <data name="Legal.Terms.Availability.P1" xml:space="preserve"><value>نسعى لإبقاء الخدمة متاحة، لكننا لا نَعِد بأنها ستخلو من الانقطاع أو الأخطاء.</value></data>
+  <data name="Legal.Terms.Availability.P2" xml:space="preserve"><value>قد تُضاف ميزات أو تُعدَّل أو تُحذف بين الإصدارات. يجوز لنا تغيير أي جزء من الخدمة أو إيقافها بإشعار معقول، وسنمنحك وقتًا لتصدير بياناتك قبل أي تغيير يزيل وسيلة التصدير.</value></data>
+  <data name="Legal.Terms.Availability.P3" xml:space="preserve"><value>يُنشر التطبيق بصيغة الشيفرة المصدرية تحت رخصة MIT، لذا يحق لك تشغيل نسختك الخاصة.</value></data>
+  <data name="Legal.Terms.Ip.Title" xml:space="preserve"><value>الملكية الفكرية</value></data>
+  <data name="Legal.Terms.Ip.Body" xml:space="preserve"><value>‏BudgetFriend واسمه وشعاره مملوكة للمشروع. أما البرمجيات الأساسية فهي مرخّصة برخصة MIT التي تسمح بالاستخدام والتعديل والتوزيع بشرط الإبقاء على إشعار حقوق النشر. ولا تقيّد هذه الشروط أي حق تمنحه تلك الرخصة.</value></data>
+  <data name="Legal.Terms.Disclaimer.Title" xml:space="preserve"><value>إخلاء المسؤولية</value></data>
+  <data name="Legal.Terms.Disclaimer.Body" xml:space="preserve"><value>إلى أقصى حد يسمح به القانون، يُقدَّم التطبيق «كما هو» و«كما هو متاح»، دون ضمانات من أي نوع، صريحة أو ضمنية، بما في ذلك صلاحية التسويق والملاءمة لغرض معين والدقة وعدم الانتهاك. ولا نضمن أن الحسابات أو التصنيفات أو الأرصدة ستناسب أغراضك.</value></data>
+  <data name="Legal.Terms.Liability.Title" xml:space="preserve"><value>حدود المسؤولية</value></data>
+  <data name="Legal.Terms.Liability.Body" xml:space="preserve"><value>إلى أقصى حد يسمح به القانون، لا يتحمل المشروع ومساهموه مسؤولية الأضرار غير المباشرة أو التبعية أو الخاصة أو التبعية المتتالية، ولا مسؤولية الأرباح المفقودة أو البيانات المفقودة، الناتجة عن استخدامك للتطبيق. وإذا استحال استبعاد المسؤولية، فإنها محدودة بمبلغ أكبر بين ما دفعته مقابل التطبيق — وهو صفر — والحد الأدنى الذي يجيزه القانون. ولا تسمح بعض الولايات القضائية باستثناءات معينة، لذا قد لا تنطبق عليك أجزاء من هذا القسم.</value></data>
+  <data name="Legal.Terms.Termination.Title" xml:space="preserve"><value>إنهاء الاتفاق</value></data>
+  <data name="Legal.Terms.Termination.P1" xml:space="preserve"><value>يمكنك التوقف عن استخدام التطبيق وحذف حسابك في أي وقت.</value></data>
+  <data name="Legal.Terms.Termination.P2" xml:space="preserve"><value>يجوز لنا تعليق حساب أو إغلاقه إذا خالف هذه الشروط، أو ظل خاملًا لفترة طويلة، أو إذا افرض القانون ذلك. وحيثما كان ذلك عمليًا سنُعلمك أولًا.</value></data>
+  <data name="Legal.Terms.Termination.P3" xml:space="preserve"><value>عند انتهاء هذا الاتفاق ينتهي حقك في استخدام التطبيق المستضاف. وتبقى رخصة MIT تسمح لك بالاستمرار في استخدام أي نسخة من البرمجيات بحوزتك.</value></data>
+  <data name="Legal.Terms.Changes.Title" xml:space="preserve"><value>التغييرات على هذه الشروط</value></data>
+  <data name="Legal.Terms.Changes.Body" xml:space="preserve"><value>قد نعدّل هذه الشروط. يسري الإصدار المعدَّل عند نشره، وتُعلن التغييرات الجوهرية داخل التطبيق. واستمرارك في استخدام BudgetFriend بعد ذلك التاريخ يعني قبولك للشروط المعدَّلة.</value></data>
+  <data name="Legal.Terms.Governing.Title" xml:space="preserve"><value>القانون الحاكم</value></data>
+  <data name="Legal.Terms.Governing.Body" xml:space="preserve"><value>تخضع هذه الشروط للقوانين السارية في المكان الذي ينشر فيه القائم على المشروع التطبيق، دون اعتبار لقواعد تنازع القوانين. وإذا وُجد بند غير قابل للنفاذ، يبقى ما عداه ساريًا. ولا يحدّ أي مما ورد هنا من حقوقك بموجب قوانين المستهلك الإلزامية.</value></data>
+  <data name="Legal.Terms.Contact" xml:space="preserve"><value>لديك أسئلة حول هذه الشروط؟ راسلنا على support@budgetfriend.zaidalkallas.me.</value></data>
 </root>
