@@ -1,9 +1,11 @@
 @inherits LocalizedComponentBase
+@implements IAsyncDisposable
 @page "/login"
 @inject IAuthService Auth
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @inject ApiSettings Settings
+@inject ThemeService Theme
 
 <div class="card auth-card">
     <div class="brand-large">
@@ -39,16 +41,33 @@
         </button>
     </EditForm>
 
-    <div class="form-divider"><span>@Local["Auth.Or"]</span></div>
-    <button class="btn btn-google btn-block" disabled="@_busy" @onclick="GoogleSignInAsync">
-        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-        </svg>
-        @Local["Auth.SignInWithGoogle"]
-    </button>
+    @if (_googleConfigured)
+    {
+        <div class="form-divider"><span>@Local["Auth.Or"]</span></div>
+
+        @if (_googleFailed)
+        {
+            <button class="btn btn-google btn-block" disabled>
+                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                @Local["Auth.SignInWithGoogle"]
+            </button>
+            <div class="validation-message" role="alert">@Local["Auth.GoogleUnavailable"]</div>
+        }
+        else
+        {
+            @* Google's own account-chooser button, rendered by Google Identity
+               Services into an iframe. It cannot be faked with a custom element:
+               the popup only opens for a real browser user gesture, which the
+               Blazor Server circuit round-trip cannot provide. Google writes
+               straight into this element, so Blazor must leave it alone. *@
+            <div @ref="_googleButtonHost" class="google-slot" style="color-scheme: light;"></div>
+        }
+    }
 
     <div class="form-note" style="text-align:center; margin-top:16px;">
         @Local["Auth.NoAccount"]
@@ -66,6 +85,145 @@
     private bool _busy;
     private string? _errorMessage;
 
+    private ElementReference _googleButtonHost;
+    private DotNetObjectReference<Login>? _selfRef;
+    private bool _googleConfigured;
+    private bool _googleReady;
+    private bool _googleFailed;
+    private bool _subscribedToTheme;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        // An unset client id means Google sign-in is not available on this
+        // host, so the divider and the button are both omitted entirely.
+        _googleConfigured = !string.IsNullOrWhiteSpace(Settings.GoogleClientId);
+
+        if (_googleConfigured)
+        {
+            Theme.ThemeChanged += OnThemeChanged;
+            _subscribedToTheme = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // The host element only exists once the button branch has rendered, and
+        // a failed attempt must not be retried on every subsequent render.
+        if (_googleConfigured && !_googleReady && !_googleFailed)
+        {
+            await RenderGoogleButtonAsync();
+        }
+    }
+
+    /// <summary>
+    /// Called by Google Identity Services once the user picks an account. The
+    /// ID token is exchanged for a BudgetFriend session by the API.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnGoogleCredentialAsync(string? credential)
+    {
+        if (string.IsNullOrEmpty(credential))
+        {
+            return;
+        }
+
+        _busy = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = await Auth.LoginWithGoogleAsync(credential);
+            if (result.IsSuccess)
+            {
+                // Same gate as the password flow: an unverified account still
+                // has to go through onboarding.
+                var profile = await Auth.RefreshProfileAsync();
+                Nav.NavigateTo(profile?.IsEmailVerified == true ? "/" : "/onboarding", forceLoad: true);
+                return;
+            }
+
+            _errorMessage = result.Error;
+        }
+        finally
+        {
+            _busy = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RenderGoogleButtonAsync()
+    {
+        // OnAfterRenderAsync only runs once the circuit is interactive, so JS
+        // interop is available here even on hosts that prerender.
+        _selfRef ??= DotNetObjectReference.Create(this);
+
+        try
+        {
+            _googleReady = await JS.InvokeAsync<bool>("bf.google.render", _googleButtonHost, Settings.GoogleClientId, _selfRef, new {
+                dark = Theme.IsDark,
+                locale = Local.LanguageCode,
+            });
+        }
+        catch (Exception ex) when (ex is JSException or InvalidOperationException or TaskCanceledException)
+        {
+            _googleReady = false;
+        }
+
+        _googleFailed = !_googleReady;
+        StateHasChanged();
+    }
+
+    private void OnThemeChanged()
+    {
+        if (!_googleConfigured || !_googleReady)
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            // The rendered button bakes in the light/dark variant, so it has to
+            // be re-rendered rather than merely restyled.
+            _googleReady = false;
+            _googleFailed = false;
+            await RenderGoogleButtonAsync();
+        });
+    }
+
+    public override void Dispose()
+    {
+        if (_subscribedToTheme)
+        {
+            Theme.ThemeChanged -= OnThemeChanged;
+            _subscribedToTheme = false;
+        }
+
+        base.Dispose();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Dispose();
+
+        _selfRef?.Dispose();
+        _selfRef = null;
+
+        if (_googleConfigured)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("bf.google.cancel");
+            }
+            catch (Exception ex) when (ex is JSException or InvalidOperationException or TaskCanceledException)
+            {
+                // The circuit is already gone; nothing left to clean up.
+            }
+        }
+    }
+
     private async Task LoginAsync()
     {
         _busy = true;
@@ -82,44 +240,6 @@
             {
                 _errorMessage = result.Error;
             }
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
-
-    private async Task GoogleSignInAsync()
-    {
-        _busy = true;
-        _errorMessage = null;
-        try
-        {
-            if (string.IsNullOrWhiteSpace(Settings.GoogleClientId))
-            {
-                _errorMessage = Local["Auth.GoogleUnavailable"];
-                return;
-            }
-
-            var credential = await JS.InvokeAsync<string>("bf.googleSignIn", Settings.GoogleClientId);
-            if (string.IsNullOrEmpty(credential))
-            {
-                return; // Flow dismissed by the user or the SDK failed to load.
-            }
-
-            var result = await Auth.LoginWithGoogleAsync(credential);
-            if (result.IsSuccess)
-            {
-                Nav.NavigateTo("/", forceLoad: true);
-            }
-            else
-            {
-                _errorMessage = result.Error;
-            }
-        }
-        catch (Exception ex) when (ex is JSException or HttpRequestException or TaskCanceledException)
-        {
-            _errorMessage = Local["Error.Network"];
         }
         finally
         {

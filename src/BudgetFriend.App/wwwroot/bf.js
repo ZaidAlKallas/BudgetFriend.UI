@@ -80,34 +80,95 @@ window.bf = (() => {
     }
   };
 
-  // Sign in with Google (Google Identity Services). Resolves with the Google
-  // ID token credential, or null if the flow was dismissed/unavailable.
-  const googleSignIn = (clientId) =>
-    new Promise((resolve) => {
-      if (!clientId) {
-        resolve(null);
-        return;
+  // ---- Google Identity Services --------------------------------------------
+  //
+  // The account chooser must come from Google's own button (`renderButton`).
+  //
+  // One Tap (`google.accounts.id.prompt()`) is deliberately NOT used: it only
+  // surfaces as a passive corner prompt, and Google refuses to display it when
+  // the call does not originate from a browser user gesture. With Blazor
+  // Server the click is replayed over the SignalR circuit, so the gesture is
+  // already gone by the time the JS runs and nothing is ever displayed. Worse,
+  // when Google declines to show the prompt it never calls `callback`, which
+  // left the awaiting .NET call suspended forever and the button stuck disabled.
+  //
+  // `renderButton` opens a real account-chooser popup and always invokes the
+  // `initialize` callback on success, which is the supported flow.
+  const gsi = (() => {
+    const SCRIPT_SRC = "https://accounts.google.com/gsi/client";
+    let loader = null;
+
+    const load = () => {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        return Promise.resolve(window.google.accounts.id);
+      }
+      if (loader) {
+        return loader;
       }
 
-      const start = () => {
-        google.accounts.id.initialize({
-          client_id: clientId,
-          callback: (resp) => resolve(resp && resp.credential ? resp.credential : null),
-        });
-        google.accounts.id.prompt();
-      };
-
-      if (window.google && google.accounts) {
-        start();
-      } else {
+      loader = new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = "https://accounts.google.com/gsi/client";
+        s.src = SCRIPT_SRC;
         s.async = true;
-        s.onload = start;
-        s.onerror = () => resolve(null);
+        s.defer = true;
+        s.onload = () =>
+          window.google && window.google.accounts && window.google.accounts.id
+            ? resolve(window.google.accounts.id)
+            : reject(new Error("gsi-unavailable"));
+        s.onerror = () => reject(new Error("gsi-load-failed"));
         document.head.appendChild(s);
+      });
+
+      // Let a later attempt retry after a transient failure (offline, blocked
+      // by an extension, ad blocker, ...) instead of replaying the rejection.
+      loader.catch(() => {
+        loader = null;
+      });
+      return loader;
+    };
+
+    // Renders the official button into `container`. The resulting ID token is
+    // pushed back to .NET through `dotNetRef.invokeMethodAsync`.
+    // Resolves false when Google could not be loaded, so the caller can report
+    // it instead of silently doing nothing.
+    const render = async (container, clientId, dotNetRef, options) => {
+      if (!container || !clientId || !dotNetRef) {
+        return false;
       }
-    });
+
+      const id = await load();
+
+      id.initialize({
+        client_id: clientId,
+        callback: (resp) => {
+          const credential = resp && resp.credential ? resp.credential : null;
+          // Fire and forget: the circuit may already be gone.
+          dotNetRef.invokeMethodAsync("OnGoogleCredentialAsync", credential).catch(() => {});
+        },
+      });
+
+      container.innerHTML = "";
+      id.renderButton(container, {
+        type: "standard",
+        theme: options && options.dark ? "outline_dark" : "outline",
+        size: "large",
+        shape: "rectangular",
+        text: "continue_with",
+        logo_alignment: "left",
+        width: Math.max(140, Math.min(container.clientWidth || 320, 400)),
+        ...(options && options.locale ? { locale: options.locale } : {}),
+      });
+      return true;
+    };
+
+    const cancel = () => {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.cancel();
+      }
+    };
+
+    return { render, cancel };
+  })();
 
   const positionPopover = (trigger, popover) => {
     if (!trigger || !popover) return;
@@ -157,9 +218,9 @@ window.bf = (() => {
     watchSystemThemeForNet,
     prefersDark,
     sessionGet,
-    sessionSet,
+    sessionSet, 
     sessionClear,
-    googleSignIn,
+    google: gsi,
     positionPopover,
     initFromAttributes,
   };

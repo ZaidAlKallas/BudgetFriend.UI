@@ -3,10 +3,12 @@
 @implements IDisposable
 
 <header class="topbar">
-    <div class="brand topbar-brand">
-        <span class="logo">B</span>
-        <span>BudgetFriend</span>
-    </div>
+    <a href="/">
+        <div class="brand topbar-brand">
+            <span class="logo">B</span> 
+            <span>BudgetFriend</span>
+        </div>
+    </a>
     <div class="topbar-actions">
         <button class="btn btn-ghost btn-icon" title="@Local["Settings.Theme"]" @onclick="CycleTheme">
             @if (Theme.SelectedTheme == AppTheme.Light)
